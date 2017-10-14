@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "../Yal/Parser.h"
+#include "../Yal/Lexer.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -14,7 +14,7 @@ namespace UnitTests
 		{
 			std::string testString = "Hello";
 			auto it = testString.cbegin();
-			std::string token = ParseToken( it, testString.cend() );
+			std::string token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "Hello" );
 		}
 
@@ -22,7 +22,7 @@ namespace UnitTests
 		{
 			std::string testString = "Hello World";
 			auto it = testString.cbegin();
-			std::string token = ParseToken( it, testString.cend() );
+			std::string token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "Hello" );
 		}
 
@@ -30,8 +30,8 @@ namespace UnitTests
 		{
 			std::string testString = "Hello World";
 			auto it = testString.cbegin();
-			ParseToken( it, testString.cend() );
-			std::string token = ParseToken( it, testString.cend() );
+			Yal::Lexer::ParseToken( it, testString.cend() );
+			std::string token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "World" );
 		}
 
@@ -39,7 +39,7 @@ namespace UnitTests
 		{
 			std::string testString = "// Foo bar\nHello";
 			auto it = testString.cbegin();
-			std::string token = ParseToken( it, testString.cend() );
+			std::string token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "Hello" );
 		}
 
@@ -49,13 +49,13 @@ namespace UnitTests
 			std::string testString = "Hello,World";
 			auto it = testString.cbegin();
 			
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "Hello" );
 			
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "," );
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "World" );
 		}
 
@@ -65,13 +65,13 @@ namespace UnitTests
 			std::string testString = "Hello=World";
 			auto it = testString.cbegin();
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "Hello" );
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "=" );
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			AssertString( token, "World" );
 		}
 
@@ -81,7 +81,7 @@ namespace UnitTests
 			std::string testString = "Hello123";
 			auto it = testString.cbegin();
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			Assert::IsTrue( token == "Hello123" );
 		}
 
@@ -91,7 +91,7 @@ namespace UnitTests
 			std::string testString = "123Hello";
 			auto it = testString.cbegin();
 
-			Assert::ExpectException< std::exception >( [&] { ParseToken( it, testString.cend() ); } );
+			Assert::ExpectException< std::exception >( [&] { Yal::Lexer::ParseToken( it, testString.cend() ); } );
 		}
 
 		TEST_METHOD( TestDoubles )
@@ -100,7 +100,7 @@ namespace UnitTests
 			std::string testString = "123.456";
 			auto it = testString.cbegin();
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			Assert::IsTrue( token == "123.456" );
 		}
 
@@ -110,7 +110,7 @@ namespace UnitTests
 			std::string testString = "123.456.789";
 			auto it = testString.cbegin();
 
-			Assert::ExpectException< std::exception >( [&] { ParseToken( it, testString.cend() ); } );
+			Assert::ExpectException< std::exception >( [&] { Yal::Lexer::ParseToken( it, testString.cend() ); } );
 		}
 
 		TEST_METHOD( TestFloatingPoints )
@@ -119,7 +119,7 @@ namespace UnitTests
 			std::string testString = "123.456f";
 			auto it = testString.cbegin();
 
-			token = ParseToken( it, testString.cend() );
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
 			Assert::IsTrue( token == "123.456f" );
 		}
 
