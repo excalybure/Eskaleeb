@@ -26,7 +26,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parserunittests.cpp">
+    <ClCompile Include="LexerTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TokenizerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

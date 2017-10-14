@@ -1,7 +1,13 @@
 #include "stdafx.h"
 #include "Tokenizer.h"
 
-TokenId TokenToTokenId( const std::string &/* token */ )
+namespace Yal
 {
-	return TOKENID_COUNT;
+	namespace Lexer
+	{
+		TokenId TokenToTokenId( const std::string &/* token */ )
+		{
+			return TOKENID_COUNT;
+		}
+	}
 }

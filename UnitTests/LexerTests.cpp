@@ -6,7 +6,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTests
 {		
-	TEST_CLASS(ParserUnitTests)
+	TEST_CLASS(LexerTests)
 	{
 	public:
 		
