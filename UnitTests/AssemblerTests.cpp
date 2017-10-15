@@ -40,14 +40,98 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "spsub\t100\n" );
 		}
 
-		TEST_METHOD( TestAddingData )
+		TEST_METHOD( TestAddingCreatingUInt8Variable )
 		{
-			std::string text( "uint32 foo = 123456" );
+			std::string text( "uint8 foo = 123" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 1 );
+			Assert::IsTrue( data[0] == 123 );
+		}
+
+		TEST_METHOD( TestAddingCreatingUInt16Variable )
+		{
+			std::string text( "uint16 foo = 12345" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 2 );
+			Assert::IsTrue( *reinterpret_cast< uint16_t * >( &data[0] ) == 12345 );
+		}
+
+		TEST_METHOD( TestAddingCreatingUInt32Variable )
+		{
+			std::string text( "uint32 foo = 123456789" );
 
 			Yal::Assembler::Assemble( text, byteCode, data );
 			
 			Assert::IsTrue( data.size() == 4 );
-			Assert::IsTrue( *reinterpret_cast< uint32_t * >( &data[0] ) == 123456 );
+			Assert::IsTrue( *reinterpret_cast< uint32_t * >( &data[0] ) == 123456789 );
+		}
+
+		TEST_METHOD( TestAddingCreatingUInt64Variable )
+		{
+			std::string text( "uint64 foo = 123456789123" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 8 );
+			Assert::IsTrue( *reinterpret_cast< uint64_t * >( &data[0] ) == 123456789123 );
+		}
+
+		TEST_METHOD( TestAddingCreatingInt8Variable )
+		{
+			std::string text( "int8 foo = -123" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 1 );
+			Assert::IsTrue( *reinterpret_cast< int8_t * >( &data[0] ) == -123 );
+		}
+
+		TEST_METHOD( TestAddingCreatingInt16Variable )
+		{
+			std::string text( "int16 foo = -12345" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 2 );
+			Assert::IsTrue( *reinterpret_cast< int16_t * >( &data[0] ) == -12345 );
+		}
+
+		TEST_METHOD( TestAddingCreatingInt32Variable )
+		{
+			std::string text( "int32 foo = -123456789" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 4 );
+			Assert::IsTrue( *reinterpret_cast< int32_t * >( &data[0] ) == -123456789 );
+		}
+
+		TEST_METHOD( TestAddingCreatingInt64Variable )
+		{
+			std::string text( "int64 foo = -123456789123" );
+
+			Yal::Assembler::Assemble( text, byteCode, data );
+
+			Assert::IsTrue( data.size() == 8 );
+			Assert::IsTrue( *reinterpret_cast< int64_t * >( &data[0] ) == -123456789123 );
+		}
+
+		TEST_METHOD( TestExceptionThrownOnNegativeNumberWhenOnlyPositiveNumbersAllowed )
+		{
+			std::string text( "uint32 foo = -123456789" );
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( text, byteCode, data ); } );
+		}
+
+		TEST_METHOD( TestExceptionThrownOnTooBigNumber)
+		{
+			std::string text( "uint8 foo = 123456789" );
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( text, byteCode, data ); } );
 		}
 
 		TEST_METHOD( TestLoadEffectiveAddress )

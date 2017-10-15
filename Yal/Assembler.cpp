@@ -2,6 +2,7 @@
 #include "Tokenizer.h"
 #include "Lexer.h"
 #include "Assembler.h"
+#include "Cast.h"
 
 namespace Yal
 {
@@ -277,16 +278,54 @@ namespace Yal
 			"casti",		// INSTR_CODE_CAST_TO_INTEGER,
 		};
 
-		void Assemble( const std::string &text, std::vector< uint8_t > &prog, std::vector< uint8_t > &data )
+		template< typename scalar_type > scalar_type TokenToScalarType( const std::string &token )
+		{
+			int64_t result = _atoi64( &token[0] );
+			return Cast< scalar_type >( result );
+		};
+
+		template< typename scalar_type >
+		void AppendScalar( const std::string &token, std::vector< uint8_t > &buffer )
+		{
+			scalar_type value;
+
+			value = TokenToScalarType< scalar_type >( token );
+			buffer.resize( buffer.size() + sizeof( value ) );
+			memcpy( &buffer[buffer.size() - sizeof( value )], &value, sizeof( value ) );
+		}
+
+		template< typename scalar_type >
+		void AppendScalar( std::string::const_iterator &it, const std::string::const_iterator &end, std::vector< uint8_t > &buffer )
+		{
+			std::string token;
+
+			token = Lexer::ParseToken( it, end );
+			if ( token == "-" )
+				token += Lexer::ParseToken( it, end );
+
+			AppendScalar< scalar_type >( token, buffer );
+		}
+
+		template< typename scalar_type >
+		void ParseVariableDefinition( std::string::const_iterator &it, const std::string::const_iterator &end, std::vector< uint8_t > &dataSegment )
+		{
+			std::string token;
+
+			token = Lexer::ParseToken( it, end ); // name
+			token = Lexer::ParseToken( it, end ); // =
+			
+			AppendScalar< scalar_type >( it, end, dataSegment );
+		}
+
+		void Assemble( const std::string &text, std::vector< uint8_t > &prog, std::vector< uint8_t > &dataSegment )
 		{
 			uint8_t registerIndex;
-			int		integerValue;
 
 			prog.clear();
 			prog.reserve( 1 * MB );
 
-			data.clear();
-			data.reserve( 1 * MB );
+			dataSegment.clear();
+			dataSegment.reserve( 1 * MB );
 
 			auto it = text.cbegin();
 			auto end = text.cend();
@@ -295,12 +334,8 @@ namespace Yal
 			{
 				std::string token = Lexer::ParseToken( it, end );
 				if ( token.empty() )
-					throw std::exception( "Unexpected encountered end of file" );
+					throw std::exception( "Unexpectedly encountered end of file" );
 				return token;
-			};
-			auto tokenToInteger = []( const std::string &token ) -> int
-			{
-				return atoi( &token[0] );
 			};
 			auto tokenToRegisterIndex = []( const std::string &token ) -> uint8_t
 			{
@@ -342,9 +377,7 @@ namespace Yal
 						case ARG_TYPE_DOUBLE_REGISTER:
 							break;
 						case ARG_TYPE_INT:
-							integerValue = tokenToInteger( token );
-							prog.resize( prog.size() + sizeof( integerValue ) );
-							memcpy( &prog[prog.size() - sizeof( int )], &integerValue, sizeof( integerValue ) );
+							AppendScalar< int32_t >( token, prog );
 							break;
 						case ARG_TYPE_FLOAT:
 							break;
@@ -357,28 +390,34 @@ namespace Yal
 				}
 				else
 				{
-					bool isType = false;
 					switch ( tokenId )
 					{
 					case Lexer::TokenId::TOKEN_INT8:
+						ParseVariableDefinition< int8_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_INT16:
+						ParseVariableDefinition< int16_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_INT32:
+						ParseVariableDefinition< int32_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_INT64:
+						ParseVariableDefinition< int64_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_UINT8:
+						ParseVariableDefinition< uint8_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_UINT16:
+						ParseVariableDefinition< uint16_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_UINT32:
+						ParseVariableDefinition< uint32_t >( it, end, dataSegment );
+						break;
 					case Lexer::TokenId::TOKEN_UINT64:
-						isType = true;
+						ParseVariableDefinition< uint64_t >( it, end, dataSegment );
 						break;
 					default:
 						break;
-					}
-
-					if ( isType )
-					{
-						token = Lexer::ParseToken( it, end ); // name
-						token = Lexer::ParseToken( it, end ); // =
-						token = Lexer::ParseToken( it, end ); // value
 					}
 				}
 			}
