@@ -7,7 +7,15 @@ namespace Yal
 		static constexpr size_t KB = 1024;
 		static constexpr size_t MB = KB * KB;
 
-		void Assemble( const std::string &text, std::vector< uint8_t > &prog, std::vector< uint8_t > &data );
-		void Disassemble( const std::vector< uint8_t > &prog, std::string &text );
+		struct Context
+		{
+			std::string									source;
+			std::vector< uint8_t >						byteCode;
+			std::vector< uint8_t >						data;
+			std::unordered_map< std::string, size_t >	variables;
+		};
+
+		void Assemble( Context& context );
+		void Disassemble( const std::vector< uint8_t > &byteCode, std::string &text );
 	}
 }

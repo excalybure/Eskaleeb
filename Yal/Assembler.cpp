@@ -285,13 +285,16 @@ namespace Yal
 		};
 
 		template< typename scalar_type >
-		void AppendScalar( const std::string &token, std::vector< uint8_t > &buffer )
+		void AppendScalar( const scalar_type value, std::vector< uint8_t > &buffer )
 		{
-			scalar_type value;
-
-			value = TokenToScalarType< scalar_type >( token );
 			buffer.resize( buffer.size() + sizeof( value ) );
 			memcpy( &buffer[buffer.size() - sizeof( value )], &value, sizeof( value ) );
+		}
+
+		template< typename scalar_type >
+		void AppendScalar( const std::string &token, std::vector< uint8_t > &buffer )
+		{
+			AppendScalar( TokenToScalarType< scalar_type >( token ), buffer );
 		}
 
 		template< typename scalar_type >
@@ -306,29 +309,37 @@ namespace Yal
 			AppendScalar< scalar_type >( token, buffer );
 		}
 
-		template< typename scalar_type >
-		void ParseVariableDefinition( std::string::const_iterator &it, const std::string::const_iterator &end, std::vector< uint8_t > &dataSegment )
+		static void AppendAddress( Context &context, const std::string &variableName )
 		{
-			std::string token;
-
-			token = Lexer::ParseToken( it, end ); // name
-			token = Lexer::ParseToken( it, end ); // =
-			
-			AppendScalar< scalar_type >( it, end, dataSegment );
+			// TODO: Test to verif variable exists
+			size_t address = context.variables[variableName];
+			AppendScalar< int32_t >( static_cast< int32_t >( address ), context.byteCode );
 		}
 
-		void Assemble( const std::string &text, std::vector< uint8_t > &prog, std::vector< uint8_t > &dataSegment )
+		template< typename scalar_type >
+		void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
+		{
+			std::string tokenName = Lexer::ParseToken( it, end ); // name
+			std::string tokenEqual = Lexer::ParseToken( it, end ); // =
+			// TODO: Test to make sure this is an assignment
+			
+			// TODO: Test to make sure this variable does not already exist
+			context.variables[tokenName] = context.data.size();
+			AppendScalar< scalar_type >( it, end, context.data );
+		}
+
+		void Assemble( Context &context )
 		{
 			uint8_t registerIndex;
 
-			prog.clear();
-			prog.reserve( 1 * MB );
+			context.byteCode.clear();
+			context.byteCode.reserve( 1 * MB );
 
-			dataSegment.clear();
-			dataSegment.reserve( 1 * MB );
+			context.data.clear();
+			context.data.reserve( 1 * MB );
 
-			auto it = text.cbegin();
-			auto end = text.cend();
+			auto it = context.source.cbegin();
+			auto end = context.source.cend();
 
 			auto parseNextToken = [&it, end] ()
 			{
@@ -352,10 +363,10 @@ namespace Yal
 					break;
 
 				Lexer::TokenId tokenId = Lexer::TokenToTokenId( token );
-				const InstructionCode &code = TokenIdToInstructionCode[tokenId];
+				const InstructionCode &code = tokenId != Lexer::TokenId::TOKENID_INVALID ? TokenIdToInstructionCode[tokenId] : INSTR_CODE_INVALID;
 				if ( code != INSTR_CODE_INVALID )
 				{
-					prog.emplace_back( code );
+					context.byteCode.emplace_back( code );
 					const InstructionDesc &instructionDesc = InstructionCodeToIntructionDesc[code];
 					for ( int argIndex = 0; argIndex < instructionDesc.argCount; ++argIndex )
 					{
@@ -370,20 +381,21 @@ namespace Yal
 						{
 						case ARG_TYPE_REGISTER:
 							registerIndex = tokenToRegisterIndex( token );
-							prog.emplace_back( registerIndex );
+							context.byteCode.emplace_back( registerIndex );
 							break;
 						case ARG_TYPE_FLOAT_REGISTER:
 							break;
 						case ARG_TYPE_DOUBLE_REGISTER:
 							break;
 						case ARG_TYPE_INT:
-							AppendScalar< int32_t >( token, prog );
+							AppendScalar< int32_t >( token, context.byteCode );
 							break;
 						case ARG_TYPE_FLOAT:
 							break;
 						case ARG_TYPE_DOUBLE:
 							break;
 						case ARG_TYPE_ADDRESS:
+							AppendAddress( context, token );
 							break;
 						}
 					}
@@ -393,28 +405,28 @@ namespace Yal
 					switch ( tokenId )
 					{
 					case Lexer::TokenId::TOKEN_INT8:
-						ParseVariableDefinition< int8_t >( it, end, dataSegment );
+						ParseVariableDefinition< int8_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_INT16:
-						ParseVariableDefinition< int16_t >( it, end, dataSegment );
+						ParseVariableDefinition< int16_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_INT32:
-						ParseVariableDefinition< int32_t >( it, end, dataSegment );
+						ParseVariableDefinition< int32_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_INT64:
-						ParseVariableDefinition< int64_t >( it, end, dataSegment );
+						ParseVariableDefinition< int64_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_UINT8:
-						ParseVariableDefinition< uint8_t >( it, end, dataSegment );
+						ParseVariableDefinition< uint8_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_UINT16:
-						ParseVariableDefinition< uint16_t >( it, end, dataSegment );
+						ParseVariableDefinition< uint16_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_UINT32:
-						ParseVariableDefinition< uint32_t >( it, end, dataSegment );
+						ParseVariableDefinition< uint32_t >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_UINT64:
-						ParseVariableDefinition< uint64_t >( it, end, dataSegment );
+						ParseVariableDefinition< uint64_t >( context, it, end );
 						break;
 					default:
 						break;
@@ -422,7 +434,7 @@ namespace Yal
 				}
 			}
 
-			prog.shrink_to_fit();
+			context.byteCode.shrink_to_fit();
 		}
 
 		void Disassemble( const std::vector< uint8_t > &prog, std::string &text )
@@ -467,6 +479,9 @@ namespace Yal
 					case ARG_TYPE_DOUBLE:
 						break;
 					case ARG_TYPE_ADDRESS:
+						memcpy( &integerValue, &it[0], sizeof( integerValue ) );
+						it += sizeof( integerValue );
+						text += std::to_string( integerValue );
 						break;
 					}
 				}
