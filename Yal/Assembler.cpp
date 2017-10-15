@@ -12,6 +12,7 @@ namespace Yal
 			INSTR_CODE_SP_ADD,
 			INSTR_CODE_SP_SUB,
 
+			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,
 			INSTR_CODE_STORE,
@@ -40,6 +41,7 @@ namespace Yal
 			INSTR_CODE_COMPARE_JUMP_IF_TRUE,
 
 			INSTR_CODE_CALL,
+			INSTR_CODE_CALL_INDIRECT,
 			INSTR_CODE_RETURN,
 
 			INSTR_CODE_ADD,
@@ -76,6 +78,11 @@ namespace Yal
 			byte argCount;
 			ArgType args[MAX_ARGS];
 
+			explicit InstructionDesc()
+				: argCount( 0 )
+			{
+			}
+
 			explicit InstructionDesc( ArgType arg0 )
 				: argCount( 1 )
 			{
@@ -108,6 +115,7 @@ namespace Yal
 			INSTR_CODE_SP_ADD,					// TOKEN_SP_ADD,
 			INSTR_CODE_SP_SUB,					// TOKEN_SP_SUB,
 
+			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,	// TOKEN_LOAD_EFFECTIVE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,			// TOKEN_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,					// TOKEN_LOAD,
 			INSTR_CODE_STORE,					// TOKEN_STORE,
@@ -136,6 +144,7 @@ namespace Yal
 			INSTR_CODE_COMPARE_JUMP_IF_TRUE,	// TOKEN_COMPARE_JUMP_IF_TRUE,
 
 			INSTR_CODE_CALL,					// TOKEN_CALL,
+			INSTR_CODE_CALL_INDIRECT,			// TOKEN_CALL_INDIRECT,
 			INSTR_CODE_RETURN,					// TOKEN_RETURN,
 
 			INSTR_CODE_ADD,						// TOKEN_ADD,
@@ -173,9 +182,10 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_ADD,
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_SUB,
 
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_EFFECTIVE_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_INT ),							// TOKEN_LOAD_IMMEDIATE,
-			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD,
-			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_STORE,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_LOAD,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_STORE,
 
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_PUSH,
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_POP,
@@ -201,7 +211,8 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_COMPARE_JUMP_IF_TRUE,
 
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_CALL,
-			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_RETURN,
+			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_INDIRECT_CALL,
+			InstructionDesc(),															// TOKEN_RETURN,
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_ADD,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_SUBTRACT,
@@ -221,6 +232,7 @@ namespace Yal
 			"spadd",		// INSTR_CODE_SP_ADD,
 			"spsub",		// INSTR_CODE_SP_SUB,
 
+			"lea",			// INSTR_CODE_LOAD_EFFECTIVE_ADDRESS
 			"ldi",			// INSTR_CODE_LOAD_IMMEDIATE,
 			"ld",			// INSTR_CODE_LOAD,
 			"st",			// INSTR_CODE_STORE,
@@ -249,6 +261,7 @@ namespace Yal
 			"jmpt",			// INSTR_CODE_COMPARE_JUMP_IF_TRUE,
 
 			"call",			// INSTR_CODE_CALL,
+			"calli",		// INSTR_CODE_CALL_INDIRECT,
 			"ret",			// INSTR_CODE_RETURN,
 
 			"add",			// INSTR_CODE_ADD,
@@ -264,13 +277,16 @@ namespace Yal
 			"casti",		// INSTR_CODE_CAST_TO_INTEGER,
 		};
 
-		void Assemble( const std::string &text, std::vector< uint8_t > &prog )
+		void Assemble( const std::string &text, std::vector< uint8_t > &prog, std::vector< uint8_t > &data )
 		{
 			uint8_t registerIndex;
 			int		integerValue;
 
 			prog.clear();
 			prog.reserve( 1 * MB );
+
+			data.clear();
+			data.reserve( 1 * MB );
 
 			auto it = text.cbegin();
 			auto end = text.cend();
@@ -300,7 +316,8 @@ namespace Yal
 				if ( token.empty() )
 					break;
 
-				const InstructionCode &code = TokenIdToInstructionCode[Lexer::TokenToTokenId( token )];
+				Lexer::TokenId tokenId = Lexer::TokenToTokenId( token );
+				const InstructionCode &code = TokenIdToInstructionCode[tokenId];
 				if ( code != INSTR_CODE_INVALID )
 				{
 					prog.emplace_back( code );
@@ -340,7 +357,29 @@ namespace Yal
 				}
 				else
 				{
+					bool isType = false;
+					switch ( tokenId )
+					{
+					case Lexer::TokenId::TOKEN_INT8:
+					case Lexer::TokenId::TOKEN_INT16:
+					case Lexer::TokenId::TOKEN_INT32:
+					case Lexer::TokenId::TOKEN_INT64:
+					case Lexer::TokenId::TOKEN_UINT8:
+					case Lexer::TokenId::TOKEN_UINT16:
+					case Lexer::TokenId::TOKEN_UINT32:
+					case Lexer::TokenId::TOKEN_UINT64:
+						isType = true;
+						break;
+					default:
+						break;
+					}
 
+					if ( isType )
+					{
+						token = Lexer::ParseToken( it, end ); // name
+						token = Lexer::ParseToken( it, end ); // =
+						token = Lexer::ParseToken( it, end ); // value
+					}
 				}
 			}
 
