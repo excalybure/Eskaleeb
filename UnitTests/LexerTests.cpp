@@ -9,7 +9,6 @@ namespace UnitTests
 	TEST_CLASS(LexerTests)
 	{
 	public:
-		
 		TEST_METHOD(TestParseTokenCanParseASimpleLiteral)
 		{
 			std::string testString = "Hello";
