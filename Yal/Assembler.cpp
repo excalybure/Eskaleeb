@@ -313,7 +313,9 @@ namespace Yal
 
 		static void AppendAddress( Context &context, const std::string &variableName )
 		{
-			// TODO: Test to verif variable exists
+			if ( context.variables.find( variableName ) == context.variables.cend() )
+				throw std::exception( "Trying to reference an unknown variable" );
+
 			int address = context.variables[variableName];
 			AppendScalar< int32_t >( address, context.byteCode );
 		}
@@ -321,12 +323,16 @@ namespace Yal
 		template< typename scalar_type >
 		void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
 		{
-			std::string tokenName = Lexer::ParseToken( it, end ); // name
-			std::string tokenEqual = Lexer::ParseToken( it, end ); // =
-			// TODO: Test to make sure this is an assignment
-			
-			// TODO: Test to make sure this variable does not already exist
+			std::string tokenName = Lexer::ParseToken( it, end );
+
+			std::string tokenEqual = Lexer::ParseToken( it, end );
+			if ( tokenEqual != "=" )
+				throw std::exception( "Expected '=' but got something else" );
+
+			if ( context.variables.find( tokenName ) != context.variables.cend() )
+				throw std::exception( "A variable by the same name was already created" );
 			context.variables[tokenName] = static_cast< int >( context.data.size() );
+
 			AppendScalar< scalar_type >( it, end, context.data );
 		}
 
@@ -439,25 +445,27 @@ namespace Yal
 			context.byteCode.shrink_to_fit();
 		}
 
-		const std::string &AddressToVariable( const AddressToVariableNameMap &addressToVariableNameMap, int address )
-		{
-			// TODO: throw if address is not in map
-			return addressToVariableNameMap.at( address );
-		}
-
-		static void DisassembleAddress( const AddressToVariableNameMap &addressToVariableNameMap, std::string &text, std::vector< uint8_t >::const_iterator &it )
-		{
-			int address;
-
-			memcpy( &address, &it[0], sizeof( address ) );
-			it += sizeof( address );
-
-			text += AddressToVariable( addressToVariableNameMap, address );
-		}
-
 		void Disassemble( const Context &context, std::string &text )
 		{
 			std::unordered_map< int, std::string > addressToVariableNameMap;
+
+			auto addressToVariable = []( const AddressToVariableNameMap &addressToVariableNameMap, int address ) -> const std::string &
+			{
+				auto it = addressToVariableNameMap.find( address );
+				if ( it == addressToVariableNameMap.cend() )
+					throw std::exception( "There is no variable at address" );
+				return it->second;
+			};
+
+			auto disassembleAddress = [&addressToVariableNameMap, &addressToVariable]( std::string &text, std::vector< uint8_t >::const_iterator &it )
+			{
+				int address;
+
+				memcpy( &address, &it[0], sizeof( address ) );
+				it += sizeof( address );
+
+				text += addressToVariable( addressToVariableNameMap, address );
+			};
 
 			text.clear();
 			text.reserve( 1 * MB );
@@ -504,7 +512,7 @@ namespace Yal
 					case ARG_TYPE_DOUBLE:
 						break;
 					case ARG_TYPE_ADDRESS:
-						DisassembleAddress( addressToVariableNameMap, text, it );
+						disassembleAddress( text, it );
 						break;
 					}
 				}

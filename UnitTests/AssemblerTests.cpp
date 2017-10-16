@@ -134,6 +134,20 @@ namespace UnitTests
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
+		TEST_METHOD( TestExceptionThrownIfAssignmentOperatorIsMissing )
+		{
+			context.source = "uint8 foo 123456789";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestExceptionThrownWhenCreatingTwoVariablesByTheSameName )
+		{
+			context.source = "uint32 foo = 123456789\nuint32 foo = 123456789";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
 		TEST_METHOD( TestLoadEffectiveAddress )
 		{
 			context.source = "uint32 foo = 123456789\nlea r10, foo";
@@ -142,6 +156,13 @@ namespace UnitTests
 			Yal::Assembler::Disassemble( context, disassembledText );
 
 			Assert::IsTrue( disassembledText == "lea r10, foo\n" );
+		}
+
+		TEST_METHOD( TestExceptionIsThrownTryingToReferenceNonExistentVariable )
+		{
+			context.source = "uint32 foo = 123456789\nlea r10, bar";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
 		TEST_METHOD( TestLoadImmediate )
