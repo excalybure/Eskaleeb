@@ -8,6 +8,8 @@ namespace Yal
 {
 	namespace Assembler
 	{
+		using AddressToVariableNameMap = std::unordered_map< int, std::string >;
+
 		enum InstructionCode : uint8_t
 		{
 			INSTR_CODE_SP_ADD,
@@ -312,8 +314,8 @@ namespace Yal
 		static void AppendAddress( Context &context, const std::string &variableName )
 		{
 			// TODO: Test to verif variable exists
-			size_t address = context.variables[variableName];
-			AppendScalar< int32_t >( static_cast< int32_t >( address ), context.byteCode );
+			int address = context.variables[variableName];
+			AppendScalar< int32_t >( address, context.byteCode );
 		}
 
 		template< typename scalar_type >
@@ -324,7 +326,7 @@ namespace Yal
 			// TODO: Test to make sure this is an assignment
 			
 			// TODO: Test to make sure this variable does not already exist
-			context.variables[tokenName] = context.data.size();
+			context.variables[tokenName] = static_cast< int >( context.data.size() );
 			AppendScalar< scalar_type >( it, end, context.data );
 		}
 
@@ -437,12 +439,35 @@ namespace Yal
 			context.byteCode.shrink_to_fit();
 		}
 
-		void Disassemble( const std::vector< uint8_t > &prog, std::string &text )
+		const std::string &AddressToVariable( const AddressToVariableNameMap &addressToVariableNameMap, int address )
 		{
+			// TODO: throw if address is not in map
+			return addressToVariableNameMap.at( address );
+		}
+
+		static void DisassembleAddress( const AddressToVariableNameMap &addressToVariableNameMap, std::string &text, std::vector< uint8_t >::const_iterator &it )
+		{
+			int address;
+
+			memcpy( &address, &it[0], sizeof( address ) );
+			it += sizeof( address );
+
+			text += AddressToVariable( addressToVariableNameMap, address );
+		}
+
+		void Disassemble( const Context &context, std::string &text )
+		{
+			std::unordered_map< int, std::string > addressToVariableNameMap;
+
 			text.clear();
 			text.reserve( 1 * MB );
-			auto it = prog.cbegin();
-			auto end = prog.cend();
+
+			addressToVariableNameMap.reserve( context.variables.size() );
+			for ( const auto &varToAdress : context.variables )
+				addressToVariableNameMap[varToAdress.second] = varToAdress.first;
+
+			auto it = context.byteCode.cbegin();
+			auto end = context.byteCode.cend();
 
 			while ( it != end )
 			{
@@ -451,7 +476,7 @@ namespace Yal
 				InstructionCode code = static_cast< InstructionCode >( *it );
 				++it;
 				text += InstructionCodeToString[code];
-				text += "\t";
+				text += " ";
 
 				const InstructionDesc &instructionDesc = InstructionCodeToIntructionDesc[code];
 				for ( int argIndex = 0; argIndex < instructionDesc.argCount; ++argIndex )
@@ -479,9 +504,7 @@ namespace Yal
 					case ARG_TYPE_DOUBLE:
 						break;
 					case ARG_TYPE_ADDRESS:
-						memcpy( &integerValue, &it[0], sizeof( integerValue ) );
-						it += sizeof( integerValue );
-						text += std::to_string( integerValue );
+						DisassembleAddress( addressToVariableNameMap, text, it );
 						break;
 					}
 				}

@@ -9,13 +9,13 @@ namespace Yal
 
 		struct Context
 		{
-			std::string									source;
-			std::vector< uint8_t >						byteCode;
-			std::vector< uint8_t >						data;
-			std::unordered_map< std::string, size_t >	variables;
+			std::string								source;
+			std::vector< uint8_t >					byteCode;
+			std::vector< uint8_t >					data;
+			std::unordered_map< std::string, int >	variables;
 		};
 
-		void Assemble( Context& context );
-		void Disassemble( const std::vector< uint8_t > &byteCode, std::string &text );
+		void Assemble( Context &context );
+		void Disassemble( const Context &context, std::string &text );
 	}
 }

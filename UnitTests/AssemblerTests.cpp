@@ -25,9 +25,9 @@ namespace UnitTests
 			context.source = "spadd 100";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "spadd\t100\n" );
+			Assert::IsTrue( disassembledText == "spadd 100\n" );
 		}
 
 		TEST_METHOD( TestStackPointerSubtract )
@@ -35,9 +35,9 @@ namespace UnitTests
 			context.source = "spsub 100";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "spsub\t100\n" );
+			Assert::IsTrue( disassembledText == "spsub 100\n" );
 		}
 
 		TEST_METHOD( TestAddingCreatingUInt8Variable )
@@ -139,9 +139,9 @@ namespace UnitTests
 			context.source = "uint32 foo = 123456789\nlea r10, foo";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "lea\tr10, 0\n" );
+			Assert::IsTrue( disassembledText == "lea r10, foo\n" );
 		}
 
 		TEST_METHOD( TestLoadImmediate )
@@ -149,9 +149,9 @@ namespace UnitTests
 			context.source = "ldi r10, 100";
 			
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "ldi\tr10, 100\n" );
+			Assert::IsTrue( disassembledText == "ldi r10, 100\n" );
 		}
 
 		TEST_METHOD( TestLoad )
@@ -159,9 +159,9 @@ namespace UnitTests
 			context.source = "ld r10, r11";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "ld\tr10, r11\n" );
+			Assert::IsTrue( disassembledText == "ld r10, r11\n" );
 		}
 
 		TEST_METHOD( TestStore )
@@ -169,9 +169,9 @@ namespace UnitTests
 			context.source = "st r10, r11";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "st\tr10, r11\n" );
+			Assert::IsTrue( disassembledText == "st r10, r11\n" );
 		}
 
 		TEST_METHOD( TestPush )
@@ -179,9 +179,9 @@ namespace UnitTests
 			context.source = "push r10";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "push\tr10\n" );
+			Assert::IsTrue( disassembledText == "push r10\n" );
 		}
 
 		TEST_METHOD( TestPop )
@@ -189,9 +189,9 @@ namespace UnitTests
 			context.source = "pop r10";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "pop\tr10\n" );
+			Assert::IsTrue( disassembledText == "pop r10\n" );
 		}
 
 		TEST_METHOD( TestMove )
@@ -199,9 +199,9 @@ namespace UnitTests
 			context.source = "mv r10, r11";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "mv\tr10, r11\n" );
+			Assert::IsTrue( disassembledText == "mv r10, r11\n" );
 		}
 
 		TEST_METHOD( TestAnd )
@@ -209,9 +209,9 @@ namespace UnitTests
 			context.source = "and r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "and\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "and r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestOr )
@@ -219,9 +219,9 @@ namespace UnitTests
 			context.source = "or r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "or\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "or r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestXor )
@@ -229,9 +229,9 @@ namespace UnitTests
 			context.source = "xor r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "xor\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "xor r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestComplement )
@@ -239,9 +239,9 @@ namespace UnitTests
 			context.source = "compl r10, r11";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "compl\tr10, r11\n" );
+			Assert::IsTrue( disassembledText == "compl r10, r11\n" );
 		}
 
 		TEST_METHOD( TestLogicalAnd )
@@ -249,9 +249,9 @@ namespace UnitTests
 			context.source = "land r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "land\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "land r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestLogicalOr )
@@ -259,9 +259,9 @@ namespace UnitTests
 			context.source = "lor r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "lor\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "lor r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestLogicalXor )
@@ -269,9 +269,9 @@ namespace UnitTests
 			context.source = "lxor r10, r11, r12";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "lxor\tr10, r11, r12\n" );
+			Assert::IsTrue( disassembledText == "lxor r10, r11, r12\n" );
 		}
 
 		TEST_METHOD( TestLogicalNot )
@@ -279,9 +279,9 @@ namespace UnitTests
 			context.source = "lnot r10, r11";
 
 			Yal::Assembler::Assemble( context );
-			Yal::Assembler::Disassemble( context.byteCode, disassembledText );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "lnot\tr10, r11\n" );
+			Assert::IsTrue( disassembledText == "lnot r10, r11\n" );
 		}
 
 	private:
