@@ -637,64 +637,69 @@ namespace Yal
 
 				InstructionCode code = static_cast< InstructionCode >( *it );
 				++it;
+
 				text += InstructionCodeToString[code];
-				text += " ";
 
 				const InstructionDesc &instructionDesc = InstructionCodeToIntructionDesc[code];
-				for ( int argIndex = 0; argIndex < instructionDesc.argCount; ++argIndex )
+				if ( instructionDesc.argCount > 0 )
 				{
-					if ( argIndex > 0 )
-						text += ", ";
-					switch ( instructionDesc.args[argIndex] )
+					text += " ";
+
+					for ( int argIndex = 0; argIndex < instructionDesc.argCount; ++argIndex )
 					{
-					case ARG_TYPE_REGISTER:
-						disassembleRegister( text, it, registerType );
-						break;
-					case ARG_TYPE_FLOAT_REGISTER:
-						break;
-					case ARG_TYPE_DOUBLE_REGISTER:
-						break;
-					case ARG_TYPE_INT:
-						switch ( registerType )
+						if ( argIndex > 0 )
+							text += ", ";
+						switch ( instructionDesc.args[argIndex] )
 						{
-						case REGISTER_TYPE_BYTE:
-							DisassembleScalar< int8_t >( text, it );
+						case ARG_TYPE_REGISTER:
+							disassembleRegister( text, it, registerType );
 							break;
-						case REGISTER_TYPE_UNSIGNED_BYTE:
-							DisassembleScalar< uint8_t >( text, it );
+						case ARG_TYPE_FLOAT_REGISTER:
 							break;
-						case REGISTER_TYPE_WORD:
-							DisassembleScalar< int16_t >( text, it );
+						case ARG_TYPE_DOUBLE_REGISTER:
 							break;
-						case REGISTER_TYPE_UNSIGNED_WORD:
-							DisassembleScalar< uint16_t >( text, it );
+						case ARG_TYPE_INT:
+							switch ( registerType )
+							{
+							case REGISTER_TYPE_BYTE:
+								DisassembleScalar< int8_t >( text, it );
+								break;
+							case REGISTER_TYPE_UNSIGNED_BYTE:
+								DisassembleScalar< uint8_t >( text, it );
+								break;
+							case REGISTER_TYPE_WORD:
+								DisassembleScalar< int16_t >( text, it );
+								break;
+							case REGISTER_TYPE_UNSIGNED_WORD:
+								DisassembleScalar< uint16_t >( text, it );
+								break;
+							case REGISTER_TYPE_DWORD:
+								DisassembleScalar< int32_t >( text, it );
+								break;
+							case REGISTER_TYPE_UNSIGNED_DWORD:
+								DisassembleScalar< uint32_t >( text, it );
+								break;
+							case REGISTER_TYPE_NATIVE:
+								DisassembleScalar< int64_t >( text, it );
+								break;
+							case REGISTER_TYPE_UNSIGNED_NATIVE:
+								DisassembleScalar< uint64_t >( text, it );
+								break;
+							default:
+								throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+							}
 							break;
-						case REGISTER_TYPE_DWORD:
-							DisassembleScalar< int32_t >( text, it );
+						case ARG_TYPE_FLOAT:
 							break;
-						case REGISTER_TYPE_UNSIGNED_DWORD:
-							DisassembleScalar< uint32_t >( text, it );
+						case ARG_TYPE_DOUBLE:
 							break;
-						case REGISTER_TYPE_NATIVE:
-							DisassembleScalar< int64_t >( text, it );
+						case ARG_TYPE_ADDRESS:
+							if ( WantsCodeAddress( code ) )
+								disassembleAddress( text, it, addressToLabelNameMap );
+							else
+								disassembleAddress( text, it, addressToVariableNameMap );
 							break;
-						case REGISTER_TYPE_UNSIGNED_NATIVE:
-							DisassembleScalar< uint64_t >( text, it );
-							break;
-						default:
-							throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
 						}
-						break;
-					case ARG_TYPE_FLOAT:
-						break;
-					case ARG_TYPE_DOUBLE:
-						break;
-					case ARG_TYPE_ADDRESS:
-						if ( WantsCodeAddress( code ) )
-							disassembleAddress( text, it, addressToLabelNameMap );
-						else
-							disassembleAddress( text, it, addressToVariableNameMap );
-						break;
 					}
 				}
 
