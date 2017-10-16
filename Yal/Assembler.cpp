@@ -74,6 +74,19 @@ namespace Yal
 			ARG_TYPE_ADDRESS,
 		};
 
+		enum RegisterType : uint8_t
+		{
+			REGISTER_TYPE_BYTE,
+			REGISTER_TYPE_UNSIGNED_BYTE,
+			REGISTER_TYPE_WORD,
+			REGISTER_TYPE_UNSIGNED_WORD,
+			REGISTER_TYPE_DWORD,
+			REGISTER_TYPE_UNSIGNED_DWORD,
+			REGISTER_TYPE_NATIVE,
+			REGISTER_TYPE_UNSIGNED_NATIVE,
+			REGISTER_TYPE_INVALID
+		};
+
 		struct InstructionDesc
 		{
 			static constexpr int MAX_ARGS = 3;
@@ -321,7 +334,7 @@ namespace Yal
 		}
 
 		template< typename scalar_type >
-		void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
+		static void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
 		{
 			std::string variableName = Lexer::ParseToken( it, end );
 
@@ -334,6 +347,16 @@ namespace Yal
 			context.variables[variableName] = static_cast< int >( context.data.size() );
 
 			AppendScalar< scalar_type >( it, end, context.data );
+		}
+
+		template< typename scalar_type >
+		static void DisassembleScalar( std::string &text, std::vector< uint8_t >::const_iterator &codeIt )
+		{
+			scalar_type value;
+
+			memcpy( &value, &codeIt[0], sizeof( value ) );
+			codeIt += sizeof( value );
+			text += std::to_string( value );
 		}
 
 		static void ParseLabel( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
@@ -378,16 +401,39 @@ namespace Yal
 					throw std::exception( "Unexpectedly encountered end of file" );
 				return token;
 			};
-			auto tokenToRegisterIndex = []( const std::string &token ) -> uint8_t
+			auto tokenToRegisterIndex = []( const std::string &token, RegisterType &registerType ) -> uint8_t
 			{
-				int index = atoi( &token[1] );
-				if ( index < 0 || index > 255 )
+				registerType = REGISTER_TYPE_NATIVE;
+				size_t index = 1;
+				switch ( token[index] )
+				{
+				case 'b':
+					registerType = REGISTER_TYPE_BYTE;
+					++index;
+					break;
+				case 'w':
+					registerType = REGISTER_TYPE_WORD;
+					++index;
+					break;
+				case 'd':
+					registerType = REGISTER_TYPE_DWORD;
+					++index;
+					break;
+				}
+				if ( token[index] == 'u' )
+				{
+					registerType = static_cast< RegisterType >( registerType + 1 );
+					index++;
+				}
+				int registerIndex = atoi( &token[index] );
+				if ( registerIndex < 0 || registerIndex > 255 )
 					throw std::exception( "Invalid register index" );
-				return static_cast< uint8_t >( index );
+				return static_cast< uint8_t >( registerIndex );
 			};
 
 			while ( it != end )
 			{
+				RegisterType registerType = REGISTER_TYPE_DWORD;
 				std::string token = Lexer::ParseToken( it, end );
 				if ( token.empty() )
 					break;
@@ -407,10 +453,14 @@ namespace Yal
 								throw std::exception( "Missing comma" );
 							token = parseNextToken();
 						}
+						if ( token == "-" )
+							token += parseNextToken();
+
 						switch ( instructionDesc.args[argIndex] )
 						{
 						case ARG_TYPE_REGISTER:
-							registerIndex = tokenToRegisterIndex( token );
+							registerIndex = tokenToRegisterIndex( token, registerType );
+							context.byteCode.emplace_back( registerType );
 							context.byteCode.emplace_back( registerIndex );
 							break;
 						case ARG_TYPE_FLOAT_REGISTER:
@@ -418,7 +468,35 @@ namespace Yal
 						case ARG_TYPE_DOUBLE_REGISTER:
 							break;
 						case ARG_TYPE_INT:
-							AppendScalar< int32_t >( token, context.byteCode );
+							switch ( registerType )
+							{
+							case REGISTER_TYPE_BYTE:
+								AppendScalar< int8_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_UNSIGNED_BYTE:
+								AppendScalar< uint8_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_WORD:
+								AppendScalar< int16_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_UNSIGNED_WORD:
+								AppendScalar< uint16_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_DWORD:
+								AppendScalar< int32_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_UNSIGNED_DWORD:
+								AppendScalar< uint32_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_NATIVE:
+								AppendScalar< int64_t >( token, context.byteCode );
+								break;
+							case REGISTER_TYPE_UNSIGNED_NATIVE:
+								AppendScalar< uint64_t >( token, context.byteCode );
+								break;
+							default:
+								throw std::exception( "INTERNAL ERROR: Register type was not set" );
+							}
 							break;
 						case ARG_TYPE_FLOAT:
 							break;
@@ -478,6 +556,13 @@ namespace Yal
 			Context::AddressToNameMap addressToVariableNameMap;
 			Context::AddressToNameMap addressToLabelNameMap;
 
+			auto computeAddressToNameMap = [] ( const Context::NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
+			{
+				addressToNameMap.reserve( nameToAddressMap.size() );
+				for ( const auto &nameToAdress : nameToAddressMap )
+					addressToNameMap[nameToAdress.second] = nameToAdress.first;
+			};
+
 			auto disassembleAddress = []( std::string &text, std::vector< uint8_t >::const_iterator &codeIt, Context::AddressToNameMap &addressToNameMap )
 			{
 				int address;
@@ -491,11 +576,42 @@ namespace Yal
 				text += nameIt->second;
 			};
 
-			auto computeAddressToNameMap = [] ( const Context::NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
+			auto disassembleRegister = []( std::string &text, std::vector< uint8_t >::const_iterator &codeIt, RegisterType &registerType )
 			{
-				addressToNameMap.reserve( nameToAddressMap.size() );
-				for ( const auto &nameToAdress : nameToAddressMap )
-					addressToNameMap[nameToAdress.second] = nameToAdress.first;
+				registerType = static_cast< RegisterType >( *codeIt );
+				++codeIt;
+				uint8_t registerIndex = *codeIt;
+				++codeIt;
+				text += 'r';
+				switch ( registerType )
+				{
+				case REGISTER_TYPE_BYTE:
+					text += 'b';
+					break;
+				case REGISTER_TYPE_UNSIGNED_BYTE:
+					text += "bu";
+					break;
+				case REGISTER_TYPE_WORD:
+					text += 'w';
+					break;
+				case REGISTER_TYPE_UNSIGNED_WORD:
+					text += "wu";
+					break;
+				case REGISTER_TYPE_DWORD:
+					text += 'd';
+					break;
+				case REGISTER_TYPE_UNSIGNED_DWORD:
+					text += "du";
+					break;
+				case REGISTER_TYPE_NATIVE:
+					break;
+				case REGISTER_TYPE_UNSIGNED_NATIVE:
+					text += 'u';
+					break;
+				default:
+					throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+				}
+				text += std::to_string( registerIndex );
 			};
 
 			text.clear();
@@ -509,8 +625,7 @@ namespace Yal
 
 			while ( it != end )
 			{
-				int registerIndex;
-				int integerValue;
+				RegisterType registerType = REGISTER_TYPE_DWORD;
 
 				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), it ) ) );
 				if ( labelIt != addressToLabelNameMap.cend() )
@@ -533,18 +648,42 @@ namespace Yal
 					switch ( instructionDesc.args[argIndex] )
 					{
 					case ARG_TYPE_REGISTER:
-						registerIndex = *it;
-						++it;
-						text += "r" + std::to_string( registerIndex );
+						disassembleRegister( text, it, registerType );
 						break;
 					case ARG_TYPE_FLOAT_REGISTER:
 						break;
 					case ARG_TYPE_DOUBLE_REGISTER:
 						break;
 					case ARG_TYPE_INT:
-						memcpy( &integerValue, &it[0], sizeof( integerValue ) );
-						it += sizeof( integerValue );
-						text += std::to_string( integerValue );
+						switch ( registerType )
+						{
+						case REGISTER_TYPE_BYTE:
+							DisassembleScalar< int8_t >( text, it );
+							break;
+						case REGISTER_TYPE_UNSIGNED_BYTE:
+							DisassembleScalar< uint8_t >( text, it );
+							break;
+						case REGISTER_TYPE_WORD:
+							DisassembleScalar< int16_t >( text, it );
+							break;
+						case REGISTER_TYPE_UNSIGNED_WORD:
+							DisassembleScalar< uint16_t >( text, it );
+							break;
+						case REGISTER_TYPE_DWORD:
+							DisassembleScalar< int32_t >( text, it );
+							break;
+						case REGISTER_TYPE_UNSIGNED_DWORD:
+							DisassembleScalar< uint32_t >( text, it );
+							break;
+						case REGISTER_TYPE_NATIVE:
+							DisassembleScalar< int64_t >( text, it );
+							break;
+						case REGISTER_TYPE_UNSIGNED_NATIVE:
+							DisassembleScalar< uint64_t >( text, it );
+							break;
+						default:
+							throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+						}
 						break;
 					case ARG_TYPE_FLOAT:
 						break;

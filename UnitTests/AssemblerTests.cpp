@@ -175,6 +175,93 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "ldi r10, 100\n" );
 		}
 
+		TEST_METHOD( TestLoadImmediateWithByteRegister )
+		{
+			context.source = "ldi rb10, 100";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rb10, 100\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithWordRegister )
+		{
+			context.source = "ldi rw10, 1000";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rw10, 1000\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithDWordRegister )
+		{
+			context.source = "ldi rd10, 100000";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rd10, 100000\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateThrowsExceptionWhenValueDoesNotFitInRegister )
+		{
+			context.source = "ldi rb10, 1000";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestLoadImmediateAcceptsNegativeNumbers )
+		{
+			context.source = "ldi rb10, -100";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rb10, -100\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithUnsignedByte )
+		{
+			context.source = "ldi rbu10, 255";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rbu10, 255\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithUnsignedWord )
+		{
+			context.source = "ldi rwu10, 65535";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rwu10, 65535\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithUnsignedDword )
+		{
+			context.source = "ldi rdu10, 4294967295";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi rdu10, 4294967295\n" );
+		}
+
+		TEST_METHOD( TestLoadImmediateWithUnsignedNative )
+		{
+			context.source = "ldi ru10, 9223372036854775807";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ldi ru10, 9223372036854775807\n" );
+		}
+
 		TEST_METHOD( TestLoad )
 		{
 			context.source = "ld r10, r11";
