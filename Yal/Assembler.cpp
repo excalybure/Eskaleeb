@@ -40,8 +40,8 @@ namespace Yal
 			INSTR_CODE_COMPARE_GREATER_THAN,
 			INSTR_CODE_COMPARE_GREATER_EQUAL,
 
-			INSTR_CODE_COMPARE_JUMP,
-			INSTR_CODE_COMPARE_JUMP_IF_TRUE,
+			INSTR_CODE_JUMP,
+			INSTR_CODE_JUMP_IF_TRUE,
 
 			INSTR_CODE_CALL,
 			INSTR_CODE_CALL_INDIRECT,
@@ -143,8 +143,8 @@ namespace Yal
 			INSTR_CODE_COMPARE_GREATER_THAN,	// TOKEN_COMPARE_GREATER_THAN,
 			INSTR_CODE_COMPARE_GREATER_EQUAL,	// TOKEN_COMPARE_GREATER_EQUAL,
 
-			INSTR_CODE_COMPARE_JUMP,			// TOKEN_COMPARE_JUMP,
-			INSTR_CODE_COMPARE_JUMP_IF_TRUE,	// TOKEN_COMPARE_JUMP_IF_TRUE,
+			INSTR_CODE_JUMP,					// TOKEN_JUMP,
+			INSTR_CODE_JUMP_IF_TRUE,			// TOKEN_JUMP_IF_TRUE,
 
 			INSTR_CODE_CALL,					// TOKEN_CALL,
 			INSTR_CODE_CALL_INDIRECT,			// TOKEN_CALL_INDIRECT,
@@ -311,29 +311,51 @@ namespace Yal
 			AppendScalar< scalar_type >( token, buffer );
 		}
 
-		static void AppendAddress( Context &context, const std::string &variableName )
+		static void AppendAddress( Context &context, const std::string &variableName, Context::NameToAddressMap &nameToAdressMap )
 		{
-			if ( context.variables.find( variableName ) == context.variables.cend() )
+			if ( nameToAdressMap.find( variableName ) == nameToAdressMap.cend() )
 				throw std::exception( "Trying to reference an unknown variable" );
 
-			int address = context.variables[variableName];
+			int address = nameToAdressMap[variableName];
 			AppendScalar< int32_t >( address, context.byteCode );
 		}
 
 		template< typename scalar_type >
 		void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
 		{
-			std::string tokenName = Lexer::ParseToken( it, end );
+			std::string variableName = Lexer::ParseToken( it, end );
 
 			std::string tokenEqual = Lexer::ParseToken( it, end );
 			if ( tokenEqual != "=" )
 				throw std::exception( "Expected '=' but got something else" );
 
-			if ( context.variables.find( tokenName ) != context.variables.cend() )
+			if ( context.variables.find( variableName ) != context.variables.cend() )
 				throw std::exception( "A variable by the same name was already created" );
-			context.variables[tokenName] = static_cast< int >( context.data.size() );
+			context.variables[variableName] = static_cast< int >( context.data.size() );
 
 			AppendScalar< scalar_type >( it, end, context.data );
+		}
+
+		static void ParseLabel( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
+		{
+			std::string labelName = Lexer::ParseToken( it, end );
+			if ( context.labels.find( labelName ) != context.labels.cend() )
+				throw std::exception( "A label by the same name was already created" );
+			context.labels[labelName] = static_cast< int >( context.byteCode.size() );
+		}
+
+		static bool WantsCodeAddress( InstructionCode code )
+		{
+			switch ( code )
+			{
+			case INSTR_CODE_JUMP:
+			case INSTR_CODE_JUMP_IF_TRUE:
+			case INSTR_CODE_CALL:
+				return true;
+			default:
+				break;
+			}
+			return false;
 		}
 
 		void Assemble( Context &context )
@@ -403,7 +425,10 @@ namespace Yal
 						case ARG_TYPE_DOUBLE:
 							break;
 						case ARG_TYPE_ADDRESS:
-							AppendAddress( context, token );
+							if ( WantsCodeAddress( code ) )
+								AppendAddress( context, token, context.labels );
+							else
+								AppendAddress( context, token, context.variables );
 							break;
 						}
 					}
@@ -436,8 +461,11 @@ namespace Yal
 					case Lexer::TokenId::TOKEN_UINT64:
 						ParseVariableDefinition< uint64_t >( context, it, end );
 						break;
-					default:
+					case Lexer::TokenId::TOKEN_COLUMN:
+						ParseLabel( context, it, end );
 						break;
+					default:
+						throw std::exception( "Unrecognized instruction" );
 					}
 				}
 			}
@@ -447,32 +475,34 @@ namespace Yal
 
 		void Disassemble( const Context &context, std::string &text )
 		{
-			std::unordered_map< int, std::string > addressToVariableNameMap;
+			Context::AddressToNameMap addressToVariableNameMap;
+			Context::AddressToNameMap addressToLabelNameMap;
 
-			auto addressToVariable = []( const AddressToVariableNameMap &addressToVariableNameMap, int address ) -> const std::string &
-			{
-				auto it = addressToVariableNameMap.find( address );
-				if ( it == addressToVariableNameMap.cend() )
-					throw std::exception( "There is no variable at address" );
-				return it->second;
-			};
-
-			auto disassembleAddress = [&addressToVariableNameMap, &addressToVariable]( std::string &text, std::vector< uint8_t >::const_iterator &it )
+			auto disassembleAddress = []( std::string &text, std::vector< uint8_t >::const_iterator &codeIt, Context::AddressToNameMap &addressToNameMap )
 			{
 				int address;
 
-				memcpy( &address, &it[0], sizeof( address ) );
-				it += sizeof( address );
+				memcpy( &address, &codeIt[0], sizeof( address ) );
+				codeIt += sizeof( address );
 
-				text += addressToVariable( addressToVariableNameMap, address );
+				auto nameIt = addressToNameMap.find( address );
+				if ( nameIt == addressToNameMap.cend() )
+					throw std::exception( "There is no variable/label at this address" );
+				text += nameIt->second;
+			};
+
+			auto computeAddressToNameMap = [] ( const Context::NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
+			{
+				addressToNameMap.reserve( nameToAddressMap.size() );
+				for ( const auto &nameToAdress : nameToAddressMap )
+					addressToNameMap[nameToAdress.second] = nameToAdress.first;
 			};
 
 			text.clear();
 			text.reserve( 1 * MB );
 
-			addressToVariableNameMap.reserve( context.variables.size() );
-			for ( const auto &varToAdress : context.variables )
-				addressToVariableNameMap[varToAdress.second] = varToAdress.first;
+			computeAddressToNameMap( context.variables, addressToVariableNameMap );
+			computeAddressToNameMap( context.labels, addressToLabelNameMap );
 
 			auto it = context.byteCode.cbegin();
 			auto end = context.byteCode.cend();
@@ -481,6 +511,15 @@ namespace Yal
 			{
 				int registerIndex;
 				int integerValue;
+
+				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), it ) ) );
+				if ( labelIt != addressToLabelNameMap.cend() )
+				{
+					text += ":";
+					text += labelIt->second;
+					text += "\n";
+				}
+
 				InstructionCode code = static_cast< InstructionCode >( *it );
 				++it;
 				text += InstructionCodeToString[code];
@@ -512,7 +551,10 @@ namespace Yal
 					case ARG_TYPE_DOUBLE:
 						break;
 					case ARG_TYPE_ADDRESS:
-						disassembleAddress( text, it );
+						if ( WantsCodeAddress( code ) )
+							disassembleAddress( text, it, addressToLabelNameMap );
+						else
+							disassembleAddress( text, it, addressToVariableNameMap );
 						break;
 					}
 				}

@@ -37,8 +37,8 @@ namespace Yal
 			s_tokenToTokenIdMap["cmpgt"] = TokenId::TOKEN_COMPARE_GREATER_THAN;
 			s_tokenToTokenIdMap["cmpge"] = TokenId::TOKEN_COMPARE_GREATER_EQUAL;
 
-			s_tokenToTokenIdMap["jmp"] = TokenId::TOKEN_COMPARE_JUMP;
-			s_tokenToTokenIdMap["jmpt"] = TokenId::TOKEN_COMPARE_JUMP_IF_TRUE;
+			s_tokenToTokenIdMap["jmp"] = TokenId::TOKEN_JUMP;
+			s_tokenToTokenIdMap["jmpt"] = TokenId::TOKEN_JUMP_IF_TRUE;
 
 			s_tokenToTokenIdMap["call"] = TokenId::TOKEN_CALL;
 			s_tokenToTokenIdMap["ret"] = TokenId::TOKEN_RETURN;

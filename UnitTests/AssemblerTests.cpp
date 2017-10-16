@@ -305,6 +305,33 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "lnot r10, r11\n" );
 		}
 
+		TEST_METHOD( TestJump )
+		{
+			context.source = ":foo\njmp foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == ":foo\njmp foo\n" );
+		}
+
+		TEST_METHOD( TestJumpIfTrue )
+		{
+			context.source = ":foo\njmpt foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == ":foo\njmpt foo\n" );
+		}
+
+		TEST_METHOD( TestExceptionIsThrownOnUnrecognizedInstruction )
+		{
+			context.source = "foo bar";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;

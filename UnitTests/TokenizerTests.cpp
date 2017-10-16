@@ -173,13 +173,13 @@ namespace UnitTests
 		TEST_METHOD( TestJump )
 		{
 			std::string token( "jmp" );
-			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_COMPARE_JUMP == Yal::Lexer::TokenToTokenId( token ) );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_JUMP == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestJumpIfTrue )
 		{
 			std::string token( "jmpt" );
-			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_COMPARE_JUMP_IF_TRUE == Yal::Lexer::TokenToTokenId( token ) );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_JUMP_IF_TRUE == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestCall )
