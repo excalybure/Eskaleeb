@@ -469,6 +469,126 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "cmpge r10, r11\n" );
 		}
 
+		TEST_METHOD( TestAdd )
+		{
+			context.source = "add r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "add r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestSub )
+		{
+			context.source = "sub r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "sub r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestMul )
+		{
+			context.source = "mul r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "mul r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestDiv )
+		{
+			context.source = "div r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "div r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestShiftRight )
+		{
+			context.source = "sr r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "sr r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestShiftLeft )
+		{
+			context.source = "sl r10, r11, r12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "sl r10, r11, r12\n" );
+		}
+
+		TEST_METHOD( TestInc )
+		{
+			context.source = "inc r10";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "inc r10\n" );
+		}
+
+		TEST_METHOD( TestDec )
+		{
+			context.source = "dec r10";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dec r10\n" );
+		}
+
+		TEST_METHOD( TestAbs )
+		{
+			context.source = "abs r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "abs r10, r11\n" );
+		}
+
+		TEST_METHOD( TestNeg )
+		{
+			context.source = "neg r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "neg r10, r11\n" );
+		}
+
+		TEST_METHOD( TestCall )
+		{
+			context.source = ":foo\ncall foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == ":foo\ncall foo\n" );
+		}
+
+		TEST_METHOD( TestReturn )
+		{
+			context.source = "ret";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ret\n" );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;
