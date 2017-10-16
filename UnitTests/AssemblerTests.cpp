@@ -419,6 +419,56 @@ namespace UnitTests
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
+		TEST_METHOD( TestCompareEqual )
+		{
+			context.source = "cmpeq r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "cmpeq r10, r11\n" );
+		}
+
+		TEST_METHOD( TestCompareLessThan )
+		{
+			context.source = "cmplt r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "cmplt r10, r11\n" );
+		}
+
+		TEST_METHOD( TestCompareLessEqual )
+		{
+			context.source = "cmple r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "cmple r10, r11\n" );
+		}
+
+		TEST_METHOD( TestCompareGreaterThan )
+		{
+			context.source = "cmpgt r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "cmpgt r10, r11\n" );
+		}
+
+		TEST_METHOD( TestCompareGreaterEqual )
+		{
+			context.source = "cmpge r10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "cmpge r10, r11\n" );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;
