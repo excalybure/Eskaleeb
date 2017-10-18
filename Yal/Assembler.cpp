@@ -159,7 +159,7 @@ namespace Yal
 			}
 		};
 
-		InstructionCode TokenIdToInstructionCode[Lexer::TokenId::TOKENID_COUNT] =
+		InstructionCode TokenIdToInstructionCode[] =
 		{
 			INSTR_CODE_INVALID,					// TOKEN_REGISTER,
 			INSTR_CODE_INVALID,					// TOKEN_FLOAT_REGISTER,
@@ -259,6 +259,9 @@ namespace Yal
 			INSTR_CODE_INVALID,					// TOKEN_UINT32,
 			INSTR_CODE_INVALID,					// TOKEN_UINT64,
 
+			INSTR_CODE_INVALID,					// TOKEN_FLOAT,
+			INSTR_CODE_INVALID,					// TOKEN_DOUBLE,
+				
 			INSTR_CODE_INVALID,					// TOKEN_LEFT_SQUARE_BRACKET,
 			INSTR_CODE_INVALID,					// TOKEN_RIGHT_SQUARE_BRACKET,
 
@@ -266,6 +269,8 @@ namespace Yal
 			INSTR_CODE_INVALID,					// TOKEN_COMMA,
 			INSTR_CODE_INVALID,					// TOKEN_COLUMN,
 		};
+		static_assert( _countof( TokenIdToInstructionCode ) == Lexer::TokenId::TOKENID_COUNT, "Too few entries in TokenIdToInstructionCode" );
+		
 
 		InstructionDesc InstructionCodeToIntructionDesc[] =
 		{
@@ -444,6 +449,16 @@ namespace Yal
 		{
 			int64_t result = _atoi64( &token[0] );
 			return Cast< scalar_type >( result );
+		};
+
+		template<> float TokenToScalarType< float >( const std::string &token )
+		{
+			return static_cast< float >( atof( &token[0] ) );
+		};
+
+		template<> double TokenToScalarType< double >( const std::string &token )
+		{
+			return atof( &token[0] );
 		};
 
 		template< typename scalar_type >
@@ -733,6 +748,12 @@ namespace Yal
 						break;
 					case Lexer::TokenId::TOKEN_UINT64:
 						ParseVariableDefinition< uint64_t >( context, it, end );
+						break;
+					case Lexer::TokenId::TOKEN_FLOAT:
+						ParseVariableDefinition< float >( context, it, end );
+						break;
+					case Lexer::TokenId::TOKEN_DOUBLE:
+						ParseVariableDefinition< double >( context, it, end );
 						break;
 					case Lexer::TokenId::TOKEN_COLUMN:
 						ParseLabel( context, it, end );

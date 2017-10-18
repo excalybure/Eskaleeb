@@ -469,6 +469,18 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_UINT64 == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
+		TEST_METHOD( TestFloat )
+		{
+			std::string token( "float" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDouble )
+		{
+			std::string token( "double" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestLeftSquareBracket )
 		{
 			std::string token( "[" );

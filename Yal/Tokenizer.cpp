@@ -101,6 +101,9 @@ namespace Yal
 			s_tokenToTokenIdMap["uint32"] = TokenId::TOKEN_UINT32;
 			s_tokenToTokenIdMap["uint64"] = TokenId::TOKEN_UINT64;
 
+			s_tokenToTokenIdMap["float"] = TokenId::TOKEN_FLOAT;
+			s_tokenToTokenIdMap["double"] = TokenId::TOKEN_DOUBLE;
+
 			s_tokenToTokenIdMap["["] = TokenId::TOKEN_LEFT_SQUARE_BRACKET;
 			s_tokenToTokenIdMap["]"] = TokenId::TOKEN_RIGHT_SQUARE_BRACKET;
 
