@@ -139,7 +139,6 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOGICAL_NOT == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
-
 		TEST_METHOD( TestCompareEqual )
 		{
 			std::string token( "cmpeq" );
@@ -168,6 +167,36 @@ namespace UnitTests
 		{
 			std::string token( "cmpge" );
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_COMPARE_GREATER_EQUAL == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCompareEqual )
+		{
+			std::string token( "fcmpeq" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COMPARE_EQUAL == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatLessThan )
+		{
+			std::string token( "fcmplt" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COMPARE_LESS_THAN == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCompareLessEqual )
+		{
+			std::string token( "fcmple" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COMPARE_LESS_EQUAL == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterThan )
+		{
+			std::string token( "fcmpgt" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COMPARE_GREATER_THAN == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterEqual )
+		{
+			std::string token( "fcmpge" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COMPARE_GREATER_EQUAL == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestJump )
@@ -258,6 +287,72 @@ namespace UnitTests
 		{
 			std::string token( "casti" );
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_CAST_TO_INTEGER == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatAdd )
+		{
+			std::string token( "fadd" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_ADD == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatSubtrack )
+		{
+			std::string token( "fsub" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_SUBTRACT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatMultiply )
+		{
+			std::string token( "fmul" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_MULTIPLY == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatDivide )
+		{
+			std::string token( "fdiv" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_DIVIDE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatAbs )
+		{
+			std::string token( "fabs" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_ABSOLUTE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatNegate )
+		{
+			std::string token( "fneg" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_NEGATE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatSqrt)
+		{
+			std::string token( "fsqrt" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_SQRT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCos)
+		{
+			std::string token( "fcos" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_COS == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatSin)
+		{
+			std::string token( "fsin" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_SIN == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatRnd)
+		{
+			std::string token( "frnd" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_RND == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestFloatCast )
+		{
+			std::string token( "fcast" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_CAST == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestInt8 )

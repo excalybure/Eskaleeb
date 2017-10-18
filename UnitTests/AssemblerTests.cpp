@@ -589,7 +589,7 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "ret\n" );
 		}
 
-		TEST_METHOD( TestLoadInFloatingPointRegister )
+		TEST_METHOD( TestLoadFloatingPointRegister )
 		{
 			context.source = "ld fr10, r11";
 
@@ -597,6 +597,197 @@ namespace UnitTests
 			Yal::Assembler::Disassemble( context, disassembledText );
 
 			Assert::IsTrue( disassembledText == "ld fr10, r11\n" );
+		}
+
+		TEST_METHOD( TestLoadDoubleFloatingPointRegister )
+		{
+			context.source = "ld dfr10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ld dfr10, r11\n" );
+		}
+
+		TEST_METHOD( TestLoadMalformedRegisterThrowsException )
+		{
+			context.source = "ld 10, r11";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestLoadMalformedFloatingPointRegisterThrowsException )
+		{
+			context.source = "ld f10, r11";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestLoadMalformedDoubleFloatingPointRegisterThrowsException )
+		{
+			context.source = "ld df10, r11";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestFloatCompareEqual )
+		{
+			context.source = "fcmpeq fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcmpeq fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCompareLessThan )
+		{
+			context.source = "fcmplt fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcmplt fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCompareLessEqual )
+		{
+			context.source = "fcmple fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcmple fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterThan )
+		{
+			context.source = "fcmpgt fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcmpgt fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterEqual )
+		{
+			context.source = "fcmpge fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcmpge fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatAdd )
+		{
+			context.source = "fadd fr10, fr11, fr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fadd fr10, fr11, fr12\n" );
+		}
+
+		TEST_METHOD( TestFloatSub )
+		{
+			context.source = "fsub fr10, fr11, fr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fsub fr10, fr11, fr12\n" );
+		}
+
+		TEST_METHOD( TestFloatMul )
+		{
+			context.source = "fmul fr10, fr11, fr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fmul fr10, fr11, fr12\n" );
+		}
+
+		TEST_METHOD( TestFloatDiv )
+		{
+			context.source = "fdiv fr10, fr11, fr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fdiv fr10, fr11, fr12\n" );
+		}
+
+		TEST_METHOD( TestFloatAbs )
+		{
+			context.source = "fabs fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fabs fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatNeg )
+		{
+			context.source = "fneg fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fneg fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatSqrt )
+		{
+			context.source = "fsqrt fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fsqrt fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCos )
+		{
+			context.source = "fcos fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcos fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatSin )
+		{
+			context.source = "fsin fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fsin fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatRnd )
+		{
+			context.source = "frnd fr10, fr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "frnd fr10, fr11\n" );
+		}
+
+		TEST_METHOD( TestFloatCast )
+		{
+			context.source = "fcast fr10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "fcast fr10, r11\n" );
 		}
 
 	private:

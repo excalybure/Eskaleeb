@@ -40,6 +40,12 @@ namespace Yal
 			INSTR_CODE_COMPARE_GREATER_THAN,
 			INSTR_CODE_COMPARE_GREATER_EQUAL,
 
+			INSTR_CODE_FLOAT_COMPARE_EQUAL,
+			INSTR_CODE_FLOAT_COMPARE_LESS_THAN,
+			INSTR_CODE_FLOAT_COMPARE_LESS_EQUAL,
+			INSTR_CODE_FLOAT_COMPARE_GREATER_THAN,
+			INSTR_CODE_FLOAT_COMPARE_GREATER_EQUAL,
+
 			INSTR_CODE_JUMP,
 			INSTR_CODE_JUMP_IF_TRUE,
 
@@ -58,6 +64,18 @@ namespace Yal
 			INSTR_CODE_SHIFT_RIGHT,
 			INSTR_CODE_SHIFT_LEFT,
 			INSTR_CODE_CAST_TO_INTEGER,
+
+			INSTR_CODE_FLOAT_ADD,
+			INSTR_CODE_FLOAT_SUBTRACT,
+			INSTR_CODE_FLOAT_MULTIPLY,
+			INSTR_CODE_FLOAT_DIVIDE,
+			INSTR_CODE_FLOAT_ABSOLUTE,
+			INSTR_CODE_FLOAT_NEGATE,
+			INSTR_CODE_FLOAT_SQRT,
+			INSTR_CODE_FLOAT_COS,
+			INSTR_CODE_FLOAT_SIN,
+			INSTR_CODE_FLOAT_RND,
+			INSTR_CODE_FLOAT_CAST,
 
 			INSTR_CODE_COUNT,
 			INSTR_CODE_INVALID = INSTR_CODE_COUNT,
@@ -158,6 +176,12 @@ namespace Yal
 			INSTR_CODE_COMPARE_GREATER_THAN,	// TOKEN_COMPARE_GREATER_THAN,
 			INSTR_CODE_COMPARE_GREATER_EQUAL,	// TOKEN_COMPARE_GREATER_EQUAL,
 
+			INSTR_CODE_FLOAT_COMPARE_EQUAL,			// TOKEN_FLOAT_COMPARE_EQUAL,
+			INSTR_CODE_FLOAT_COMPARE_LESS_THAN,		// TOKEN_FLOAT_COMPARE_LESS_THAN,
+			INSTR_CODE_FLOAT_COMPARE_LESS_EQUAL,	// TOKEN_FLOAT_COMPARE_LESS_EQUAL,
+			INSTR_CODE_FLOAT_COMPARE_GREATER_THAN,	// TOKEN_FLOAT_COMPARE_GREATER_THAN,
+			INSTR_CODE_FLOAT_COMPARE_GREATER_EQUAL,	// TOKEN_FLOAT_COMPARE_GREATER_EQUAL,
+
 			INSTR_CODE_JUMP,					// TOKEN_JUMP,
 			INSTR_CODE_JUMP_IF_TRUE,			// TOKEN_JUMP_IF_TRUE,
 
@@ -177,6 +201,18 @@ namespace Yal
 			INSTR_CODE_SHIFT_LEFT,				// TOKEN_SHIFT_LEFT,
 			INSTR_CODE_CAST_TO_INTEGER,			// TOKEN_CAST_TO_INTEGER,
 
+			INSTR_CODE_FLOAT_ADD,				// TOKEN_FLOAT_ADD,
+			INSTR_CODE_FLOAT_SUBTRACT,			// TOKEN_FLOAT_SUBTRACT,
+			INSTR_CODE_FLOAT_MULTIPLY,			// TOKEN_FLOAT_MULTIPLY,
+			INSTR_CODE_FLOAT_DIVIDE,			// TOKEN_FLOAT_DIVIDE,
+			INSTR_CODE_FLOAT_ABSOLUTE,			// TOKEN_FLOAT_ABSOLUTE,
+			INSTR_CODE_FLOAT_NEGATE,			// TOKEN_FLOAT_NEGATE,
+			INSTR_CODE_FLOAT_SQRT,				// TOKEN_FLOAT_SQRT,
+			INSTR_CODE_FLOAT_COS,				// TOKEN_FLOAT_COS,
+			INSTR_CODE_FLOAT_SIN,				// TOKEN_FLOAT_SIN,
+			INSTR_CODE_FLOAT_RND,				// TOKEN_FLOAT_RND,
+			INSTR_CODE_FLOAT_CAST,				// TOKEN_FLOAT_CAST,
+
 			INSTR_CODE_INVALID,					// TOKEN_INT8,
 			INSTR_CODE_INVALID,					// TOKEN_INT16,
 			INSTR_CODE_INVALID,					// TOKEN_INT32,
@@ -195,7 +231,7 @@ namespace Yal
 			INSTR_CODE_INVALID,					// TOKEN_COLUMN,
 		};
 
-		InstructionDesc InstructionCodeToIntructionDesc[INSTR_CODE_COUNT] =
+		InstructionDesc InstructionCodeToIntructionDesc[] =
 		{
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_ADD,
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_SUB,
@@ -225,6 +261,12 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_COMPARE_GREATER_THAN,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_COMPARE_GREATER_EQUAL,
 
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COMPARE_EQUAL,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COMPARE_LESS_THAN,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COMPARE_LESS_EQUAL,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COMPARE_GREATER_THAN,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COMPARE_GREATER_EQUAL,
+
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_COMPARE_JUMP,
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_COMPARE_JUMP_IF_TRUE,
 
@@ -243,7 +285,20 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_SHIFT_RIGHT,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_SHIFT_LEFT,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_FLOAT_REGISTER ),				// TOKEN_CAST_TO_INTEGER,
+
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),	// TOKEN_FLOAT_ADD,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),	// TOKEN_FLOAT_SUBTRACT,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),	// TOKEN_FLOAT_MULTIPLY,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),	// TOKEN_FLOAT_DIVIDE,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_ABSOLUTE,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_NEGATE,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_SQRT,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_COS,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_SIN,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT_REGISTER ),		// TOKEN_FLOAT_RND,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_REGISTER ),				// TOKEN_FLOAT_CAST,
 		};
+		static_assert( _countof( InstructionCodeToIntructionDesc )  == INSTR_CODE_COUNT, "Too few entries in InstructionCodeToIntructionDesc" );
 
 		const char *InstructionCodeToString[INSTR_CODE_COUNT]
 		{
@@ -275,6 +330,12 @@ namespace Yal
 			"cmpgt",		// INSTR_CODE_COMPARE_GREATER_THAN,
 			"cmpge",		// INSTR_CODE_COMPARE_GREATER_EQUAL,
 
+			"fcmpeq",		// INSTR_CODE_FLOAT_COMPARE_EQUAL,
+			"fcmplt",		// INSTR_CODE_FLOAT_COMPARE_LESS_THAN,
+			"fcmple",		// INSTR_CODE_FLOAT_COMPARE_LESS_EQUAL,
+			"fcmpgt",		// INSTR_CODE_FLOAT_COMPARE_GREATER_THAN,
+			"fcmpge",		// INSTR_CODE_FLOAT_COMPARE_GREATER_EQUAL,
+
 			"jmp",			// INSTR_CODE_COMPARE_JUMP,
 			"jmpt",			// INSTR_CODE_COMPARE_JUMP_IF_TRUE,
 
@@ -293,6 +354,18 @@ namespace Yal
 			"sr",			// INSTR_CODE_SHIFT_RIGHT,
 			"sl",			// INSTR_CODE_SHIFT_LEFT,
 			"casti",		// INSTR_CODE_CAST_TO_INTEGER,
+
+			"fadd",			// INSTR_CODE_FLOAT_ADD,
+			"fsub",			// INSTR_CODE_FLOAT_SUBTRACT,
+			"fmul",			// INSTR_CODE_FLOAT_MULTIPLY,
+			"fdiv",			// INSTR_CODE_FLOAT_DIVIDE,
+			"fabs",			// INSTR_CODE_FLOAT_ABSOLUTE,
+			"fneg",			// INSTR_CODE_FLOAT_NEGATE,
+			"fsqrt",		// INSTR_CODE_FLOAT_SQRT,
+			"fcos",			// INSTR_CODE_FLOAT_COS,
+			"fsin",			// INSTR_CODE_FLOAT_SIN,
+			"frnd",			// INSTR_CODE_FLOAT_RND,
+			"fcast",		// INSTR_CODE_FLOAT_CAST,
 		};
 
 		template< typename scalar_type > scalar_type TokenToScalarType( const std::string &token )
@@ -414,17 +487,29 @@ namespace Yal
 
 			auto tokenToRegisterIndex = [&extractRegisterIndex]( const std::string &token, RegisterType &registerType ) -> uint8_t
 			{
-				size_t index = 1;
+				size_t index;
 
-				// TODO: Assert register
 				if ( token[0] == 'f' )
 				{
 					registerType = REGISTER_TYPE_FLOAT;
-					// TODO: Assert register
+					if ( token[1] != 'r' )
+						throw std::exception( "Malformed floating point register" );
 					index = 2;
+				}
+				else if ( token[0] == 'd' )
+				{
+					registerType = REGISTER_TYPE_DOUBLE;
+					if ( token[1] != 'f' || token[2] != 'r' )
+						throw std::exception( "Malformed floating point register" );
+					index = 3;
 				}
 				else
 				{
+					if ( token[0] != 'r' )
+						throw std::exception( "Malformed register" );
+					
+					index = 1;
+
 					registerType = REGISTER_TYPE_NATIVE;
 					switch ( token[index] )
 					{
@@ -613,6 +698,10 @@ namespace Yal
 				{
 					text += "fr";
 				}
+				else if ( registerType == REGISTER_TYPE_DOUBLE )
+				{
+					text += "dfr";
+				}
 				else
 				{
 					text += 'r';
@@ -689,11 +778,9 @@ namespace Yal
 						switch ( instructionDesc.args[argIndex] )
 						{
 						case ARG_TYPE_REGISTER:
-							disassembleRegister( text, it, registerType );
-							break;
 						case ARG_TYPE_FLOAT_REGISTER:
-							break;
 						case ARG_TYPE_DOUBLE_REGISTER:
+							disassembleRegister( text, it, registerType );
 							break;
 						case ARG_TYPE_INT:
 							switch ( registerType )
