@@ -579,6 +579,16 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == ":foo\ncall foo\n" );
 		}
 
+		TEST_METHOD( TestIndirectCall )
+		{
+			context.source = "calli r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "calli r11\n" );
+		}
+
 		TEST_METHOD( TestReturn )
 		{
 			context.source = "ret";
@@ -958,6 +968,16 @@ namespace UnitTests
 
 			Assert::IsTrue( context.data.size() == sizeof( float ) );
 			Assert::IsTrue( *reinterpret_cast< float * >( &context.data[0] ) == 123.0f );
+		}
+
+		TEST_METHOD( TestAddingCreatingDoubleVariable )
+		{
+			context.source = "double foo = 123.0";
+
+			Yal::Assembler::Assemble( context );
+
+			Assert::IsTrue( context.data.size() == sizeof( double ) );
+			Assert::IsTrue( *reinterpret_cast< double * >( &context.data[0] ) == 123.0 );
 		}
 
 		TEST_METHOD( TestAddingCreatingDoubleVariable )

@@ -53,6 +53,7 @@ namespace Yal
 			s_tokenToTokenIdMap["jmpt"] = TokenId::TOKEN_JUMP_IF_TRUE;
 
 			s_tokenToTokenIdMap["call"] = TokenId::TOKEN_CALL;
+			s_tokenToTokenIdMap["calli"] = TokenId::TOKEN_CALL_INDIRECT;
 			s_tokenToTokenIdMap["ret"] = TokenId::TOKEN_RETURN;
 
 			s_tokenToTokenIdMap["add"] = TokenId::TOKEN_ADD;

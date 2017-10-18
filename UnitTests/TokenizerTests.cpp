@@ -217,6 +217,12 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_CALL == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
+		TEST_METHOD( TestCallIndirect )
+		{
+			std::string token( "calli" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_CALL_INDIRECT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestReturn )
 		{
 			std::string token( "ret" );
