@@ -355,6 +355,72 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_FLOAT_CAST == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
+		TEST_METHOD( TestDoubleAdd )
+		{
+			std::string token( "dfadd" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_ADD == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleSubtrack )
+		{
+			std::string token( "dfsub" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_SUBTRACT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleMultiply )
+		{
+			std::string token( "dfmul" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_MULTIPLY == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleDivide )
+		{
+			std::string token( "dfdiv" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_DIVIDE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleAbs )
+		{
+			std::string token( "dfabs" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_ABSOLUTE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleNegate )
+		{
+			std::string token( "dfneg" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_NEGATE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleSqrt )
+		{
+			std::string token( "dfsqrt" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_SQRT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleCos )
+		{
+			std::string token( "dfcos" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_COS == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleSin )
+		{
+			std::string token( "dfsin" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_SIN == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleRnd )
+		{
+			std::string token( "dfrnd" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_RND == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestDoubleCast )
+		{
+			std::string token( "dfcast" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_DOUBLE_CAST == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestInt8 )
 		{
 			std::string token( "int8" );

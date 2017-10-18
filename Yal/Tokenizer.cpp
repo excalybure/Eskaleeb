@@ -43,6 +43,12 @@ namespace Yal
 			s_tokenToTokenIdMap["fcmpgt"] = TokenId::TOKEN_FLOAT_COMPARE_GREATER_THAN;
 			s_tokenToTokenIdMap["fcmpge"] = TokenId::TOKEN_FLOAT_COMPARE_GREATER_EQUAL;
 
+			s_tokenToTokenIdMap["dfcmpeq"] = TokenId::TOKEN_DOUBLE_COMPARE_EQUAL;
+			s_tokenToTokenIdMap["dfcmplt"] = TokenId::TOKEN_DOUBLE_COMPARE_LESS_THAN;
+			s_tokenToTokenIdMap["dfcmple"] = TokenId::TOKEN_DOUBLE_COMPARE_LESS_EQUAL;
+			s_tokenToTokenIdMap["dfcmpgt"] = TokenId::TOKEN_DOUBLE_COMPARE_GREATER_THAN;
+			s_tokenToTokenIdMap["dfcmpge"] = TokenId::TOKEN_DOUBLE_COMPARE_GREATER_EQUAL;
+
 			s_tokenToTokenIdMap["jmp"] = TokenId::TOKEN_JUMP;
 			s_tokenToTokenIdMap["jmpt"] = TokenId::TOKEN_JUMP_IF_TRUE;
 
@@ -72,6 +78,18 @@ namespace Yal
 			s_tokenToTokenIdMap["fsin"] = TokenId::TOKEN_FLOAT_SIN;
 			s_tokenToTokenIdMap["frnd"] = TokenId::TOKEN_FLOAT_RND;
 			s_tokenToTokenIdMap["fcast"] = TokenId::TOKEN_FLOAT_CAST;
+
+			s_tokenToTokenIdMap["dfadd"] = TokenId::TOKEN_DOUBLE_ADD;
+			s_tokenToTokenIdMap["dfsub"] = TokenId::TOKEN_DOUBLE_SUBTRACT;
+			s_tokenToTokenIdMap["dfmul"] = TokenId::TOKEN_DOUBLE_MULTIPLY;
+			s_tokenToTokenIdMap["dfdiv"] = TokenId::TOKEN_DOUBLE_DIVIDE;
+			s_tokenToTokenIdMap["dfabs"] = TokenId::TOKEN_DOUBLE_ABSOLUTE;
+			s_tokenToTokenIdMap["dfneg"] = TokenId::TOKEN_DOUBLE_NEGATE;
+			s_tokenToTokenIdMap["dfsqrt"] = TokenId::TOKEN_DOUBLE_SQRT;
+			s_tokenToTokenIdMap["dfcos"] = TokenId::TOKEN_DOUBLE_COS;
+			s_tokenToTokenIdMap["dfsin"] = TokenId::TOKEN_DOUBLE_SIN;
+			s_tokenToTokenIdMap["dfrnd"] = TokenId::TOKEN_DOUBLE_RND;
+			s_tokenToTokenIdMap["dfcast"] = TokenId::TOKEN_DOUBLE_CAST;
 
 			s_tokenToTokenIdMap["int8"] = TokenId::TOKEN_INT8;
 			s_tokenToTokenIdMap["int16"] = TokenId::TOKEN_INT16;

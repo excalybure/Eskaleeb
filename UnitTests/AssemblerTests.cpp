@@ -790,6 +790,166 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "fcast fr10, r11\n" );
 		}
 
+		TEST_METHOD( TestDoubleCompareEqual )
+		{
+			context.source = "dfcmpeq dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcmpeq dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessThan )
+		{
+			context.source = "dfcmplt dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcmplt dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessEqual )
+		{
+			context.source = "dfcmple dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcmple dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterThan )
+		{
+			context.source = "dfcmpgt dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcmpgt dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterEqual )
+		{
+			context.source = "dfcmpge dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcmpge dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleAdd )
+		{
+			context.source = "dfadd dfr10, dfr11, dfr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfadd dfr10, dfr11, dfr12\n" );
+		}
+
+		TEST_METHOD( TestDoubleSub )
+		{
+			context.source = "dfsub dfr10, dfr11, dfr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfsub dfr10, dfr11, dfr12\n" );
+		}
+
+		TEST_METHOD( TestDoubleMul )
+		{
+			context.source = "dfmul dfr10, dfr11, dfr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfmul dfr10, dfr11, dfr12\n" );
+		}
+
+		TEST_METHOD( TestDoubleDiv )
+		{
+			context.source = "dfdiv dfr10, dfr11, dfr12";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfdiv dfr10, dfr11, dfr12\n" );
+		}
+
+		TEST_METHOD( TestDoubleAbs )
+		{
+			context.source = "dfabs dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfabs dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleNeg )
+		{
+			context.source = "dfneg dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfneg dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleSqrt )
+		{
+			context.source = "dfsqrt dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfsqrt dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCos )
+		{
+			context.source = "dfcos dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcos dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleSin )
+		{
+			context.source = "dfsin dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfsin dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleRnd )
+		{
+			context.source = "dfrnd dfr10, dfr11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfrnd dfr10, dfr11\n" );
+		}
+
+		TEST_METHOD( TestDoubleCast )
+		{
+			context.source = "dfcast dfr10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfcast dfr10, r11\n" );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;
