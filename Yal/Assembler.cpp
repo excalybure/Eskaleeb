@@ -84,6 +84,8 @@ namespace Yal
 			REGISTER_TYPE_UNSIGNED_DWORD,
 			REGISTER_TYPE_NATIVE,
 			REGISTER_TYPE_UNSIGNED_NATIVE,
+			REGISTER_TYPE_FLOAT,
+			REGISTER_TYPE_DOUBLE,
 			REGISTER_TYPE_INVALID
 		};
 
@@ -401,34 +403,57 @@ namespace Yal
 					throw std::exception( "Unexpectedly encountered end of file" );
 				return token;
 			};
-			auto tokenToRegisterIndex = []( const std::string &token, RegisterType &registerType ) -> uint8_t
+
+			auto extractRegisterIndex = []( const std::string &token, size_t offset )->uint8_t
 			{
-				registerType = REGISTER_TYPE_NATIVE;
-				size_t index = 1;
-				switch ( token[index] )
-				{
-				case 'b':
-					registerType = REGISTER_TYPE_BYTE;
-					++index;
-					break;
-				case 'w':
-					registerType = REGISTER_TYPE_WORD;
-					++index;
-					break;
-				case 'd':
-					registerType = REGISTER_TYPE_DWORD;
-					++index;
-					break;
-				}
-				if ( token[index] == 'u' )
-				{
-					registerType = static_cast< RegisterType >( registerType + 1 );
-					index++;
-				}
-				int registerIndex = atoi( &token[index] );
+				int registerIndex = atoi( &token[offset] );
 				if ( registerIndex < 0 || registerIndex > 255 )
 					throw std::exception( "Invalid register index" );
 				return static_cast< uint8_t >( registerIndex );
+			};
+
+			auto tokenToRegisterIndex = [&extractRegisterIndex]( const std::string &token, RegisterType &registerType ) -> uint8_t
+			{
+				size_t index = 1;
+
+				// TODO: Assert register
+				if ( token[0] == 'f' )
+				{
+					registerType = REGISTER_TYPE_FLOAT;
+					// TODO: Assert register
+					index = 2;
+				}
+				else
+				{
+					registerType = REGISTER_TYPE_NATIVE;
+					switch ( token[index] )
+					{
+					case 'b':
+						registerType = REGISTER_TYPE_BYTE;
+						++index;
+						break;
+					case 'w':
+						registerType = REGISTER_TYPE_WORD;
+						++index;
+						break;
+					case 'd':
+						registerType = REGISTER_TYPE_DWORD;
+						++index;
+						break;
+					}
+					if ( token[index] == 'u' )
+					{
+						registerType = static_cast< RegisterType >( registerType + 1 );
+						index++;
+					}
+				}
+				return extractRegisterIndex( token, index );
+			};
+
+			auto tokenToFloatRegisterIndex = [&extractRegisterIndex] ( const std::string &token ) -> uint8_t
+			{
+				// TODO: Assert float register
+				return extractRegisterIndex( token, 2 );
 			};
 
 			while ( it != end )
@@ -464,6 +489,8 @@ namespace Yal
 							context.byteCode.emplace_back( registerIndex );
 							break;
 						case ARG_TYPE_FLOAT_REGISTER:
+							context.byteCode.emplace_back( REGISTER_TYPE_FLOAT );
+							context.byteCode.emplace_back( tokenToFloatRegisterIndex( token ) );
 							break;
 						case ARG_TYPE_DOUBLE_REGISTER:
 							break;
@@ -582,34 +609,44 @@ namespace Yal
 				++codeIt;
 				uint8_t registerIndex = *codeIt;
 				++codeIt;
-				text += 'r';
-				switch ( registerType )
+				if ( registerType == REGISTER_TYPE_FLOAT )
 				{
-				case REGISTER_TYPE_BYTE:
-					text += 'b';
-					break;
-				case REGISTER_TYPE_UNSIGNED_BYTE:
-					text += "bu";
-					break;
-				case REGISTER_TYPE_WORD:
-					text += 'w';
-					break;
-				case REGISTER_TYPE_UNSIGNED_WORD:
-					text += "wu";
-					break;
-				case REGISTER_TYPE_DWORD:
-					text += 'd';
-					break;
-				case REGISTER_TYPE_UNSIGNED_DWORD:
-					text += "du";
-					break;
-				case REGISTER_TYPE_NATIVE:
-					break;
-				case REGISTER_TYPE_UNSIGNED_NATIVE:
-					text += 'u';
-					break;
-				default:
-					throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+					text += "fr";
+				}
+				else
+				{
+					text += 'r';
+					switch ( registerType )
+					{
+					case REGISTER_TYPE_BYTE:
+						text += 'b';
+						break;
+					case REGISTER_TYPE_UNSIGNED_BYTE:
+						text += "bu";
+						break;
+					case REGISTER_TYPE_WORD:
+						text += 'w';
+						break;
+					case REGISTER_TYPE_UNSIGNED_WORD:
+						text += "wu";
+						break;
+					case REGISTER_TYPE_DWORD:
+						text += 'd';
+						break;
+					case REGISTER_TYPE_UNSIGNED_DWORD:
+						text += "du";
+						break;
+					case REGISTER_TYPE_NATIVE:
+						break;
+					case REGISTER_TYPE_UNSIGNED_NATIVE:
+						text += 'u';
+						break;
+					case REGISTER_TYPE_FLOAT:
+						text += 'f';
+						break;
+					default:
+						throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+					}
 				}
 				text += std::to_string( registerIndex );
 			};

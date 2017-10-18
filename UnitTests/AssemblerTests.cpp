@@ -589,6 +589,16 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "ret\n" );
 		}
 
+		TEST_METHOD( TestLoadInFloatingPointRegister )
+		{
+			context.source = "ld fr10, r11";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "ld fr10, r11\n" );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;
