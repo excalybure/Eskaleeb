@@ -17,6 +17,8 @@ namespace Yal
 
 			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,
+			INSTR_CODE_FLOAT_LOAD_IMMEDIATE,
+			INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,
 			INSTR_CODE_STORE,
 
@@ -171,6 +173,8 @@ namespace Yal
 
 			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,	// TOKEN_LOAD_EFFECTIVE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,			// TOKEN_LOAD_IMMEDIATE,
+			INSTR_CODE_FLOAT_LOAD_IMMEDIATE,	// TOKEN_FLOAT_LOAD_IMMEDIATE,
+			INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,	// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,					// TOKEN_LOAD,
 			INSTR_CODE_STORE,					// TOKEN_STORE,
 
@@ -279,6 +283,8 @@ namespace Yal
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_EFFECTIVE_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_INT ),							// TOKEN_LOAD_IMMEDIATE,
+			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT ),					// TOKEN_FLOAT_LOAD_IMMEDIATE,
+			InstructionDesc( ARG_TYPE_DOUBLE_REGISTER, ARG_TYPE_DOUBLE ),				// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_LOAD,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_STORE,
 
@@ -359,13 +365,15 @@ namespace Yal
 		};
 		static_assert( _countof( InstructionCodeToIntructionDesc )  == INSTR_CODE_COUNT, "Too few entries in InstructionCodeToIntructionDesc" );
 
-		const char *InstructionCodeToString[INSTR_CODE_COUNT]
+		const char *InstructionCodeToString[]
 		{
 			"spadd",		// INSTR_CODE_SP_ADD,
 			"spsub",		// INSTR_CODE_SP_SUB,
 
 			"lea",			// INSTR_CODE_LOAD_EFFECTIVE_ADDRESS
 			"ldi",			// INSTR_CODE_LOAD_IMMEDIATE,
+			"fldi",			// INSTR_CODE_FLOAT_LOAD_IMMEDIATE,
+			"dfldi",		// INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,
 			"ld",			// INSTR_CODE_LOAD,
 			"st",			// INSTR_CODE_STORE,
 
@@ -444,6 +452,7 @@ namespace Yal
 			"dfrnd",		// INSTR_CODE_DOUBLE_RND,
 			"dfcast",		// INSTR_CODE_DOUBLE_CAST,
 		};
+		static_assert( _countof( InstructionCodeToString ) == INSTR_CODE_COUNT, "Too few entries in InstructionCodeToString" );
 
 		template< typename scalar_type > scalar_type TokenToScalarType( const std::string &token )
 		{
@@ -624,17 +633,18 @@ namespace Yal
 
 			auto tokenToFloatRegisterIndex = [&extractRegisterIndex] ( const std::string &token ) -> uint8_t
 			{
-				// TODO: Assert float register
+				if ( token[0] != 'f' || token[1] != 'r' )
+					throw std::exception( "Malformed floating point register" );
 				return extractRegisterIndex( token, 2 );
 			};
 
 			auto tokenToDoubleRegisterIndex = [&extractRegisterIndex] ( const std::string &token ) -> uint8_t
 			{
-				// TODO: Assert double register
+				if ( token[0] != 'd' || token[1] != 'f' || token[2] != 'r' )
+					throw std::exception( "Malformed double register" );
 				return extractRegisterIndex( token, 3 );
 			};
 			
-
 			while ( it != end )
 			{
 				RegisterType registerType = REGISTER_TYPE_DWORD;
@@ -707,10 +717,10 @@ namespace Yal
 							}
 							break;
 						case ARG_TYPE_FLOAT:
-							// TODO
+							AppendScalar< float >( token, context.byteCode );
 							break;
 						case ARG_TYPE_DOUBLE:
-							// TODO
+							AppendScalar< double >( token, context.byteCode );
 							break;
 						case ARG_TYPE_ADDRESS:
 							if ( WantsCodeAddress( code ) )
@@ -918,10 +928,10 @@ namespace Yal
 							}
 							break;
 						case ARG_TYPE_FLOAT:
-							// TODO
+							DisassembleScalar< float >( text, it );
 							break;
 						case ARG_TYPE_DOUBLE:
-							// TODO
+							DisassembleScalar< double >( text, it );
 							break;
 						case ARG_TYPE_ADDRESS:
 							if ( WantsCodeAddress( code ) )

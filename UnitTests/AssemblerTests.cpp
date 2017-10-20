@@ -980,14 +980,38 @@ namespace UnitTests
 			Assert::IsTrue( *reinterpret_cast< double * >( &context.data[0] ) == 123.0 );
 		}
 
-		TEST_METHOD( TestAddingCreatingDoubleVariable )
+		TEST_METHOD( TestExceptionThrownOnInvalidFloatRegister )
 		{
-			context.source = "double foo = 123.0";
+			context.source = "frnd f10, fr11";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestExceptionThrownOnInvalidDoubleRegister )
+		{
+			context.source = "dfrnd fr10, dfr11";
+
+			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
+		}
+
+		TEST_METHOD( TestFloatLoadImmediate )
+		{
+			context.source = "fldi fr10, 100.0f";
 
 			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( context.data.size() == sizeof( double ) );
-			Assert::IsTrue( *reinterpret_cast< double * >( &context.data[0] ) == 123.0 );
+			Assert::IsTrue( disassembledText == "fldi fr10, 100.000000\n" );
+		}
+
+		TEST_METHOD( TestDoubleLoadImmediate )
+		{
+			context.source = "dfldi dfr10, 100.0";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "dfldi dfr10, 100.000000\n" );
 		}
 
 	private:
