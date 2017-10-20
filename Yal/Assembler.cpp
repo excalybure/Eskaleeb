@@ -471,10 +471,12 @@ namespace Yal
 		};
 
 		template< typename scalar_type >
-		void AppendScalar( const scalar_type value, std::vector< uint8_t > &buffer )
+		void AppendScalar( const scalar_type value, std::vector< uint8_t > &buffer, size_t arraySize = 1 )
 		{
-			buffer.resize( buffer.size() + sizeof( value ) );
-			memcpy( &buffer[buffer.size() - sizeof( value )], &value, sizeof( value ) );
+			size_t startOffset = buffer.size();
+			buffer.resize( startOffset + sizeof( value ) * arraySize );
+			for( size_t index = 0; index < arraySize; ++index )
+				memcpy( &buffer[startOffset + sizeof( value ) * index], &value, sizeof( value ) );
 		}
 
 		template< typename scalar_type >
@@ -507,17 +509,39 @@ namespace Yal
 		template< typename scalar_type >
 		static void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
 		{
-			std::string variableName = Lexer::ParseToken( it, end );
+			size_t arraySize = 1;
 
-			std::string tokenEqual = Lexer::ParseToken( it, end );
-			if ( tokenEqual != "=" )
-				throw std::exception( "Expected '=' but got something else" );
+			std::string variableName = Lexer::ParseToken( it, end );
 
 			if ( context.variables.find( variableName ) != context.variables.cend() )
 				throw std::exception( "A variable by the same name was already created" );
 			context.variables[variableName] = static_cast< int >( context.data.size() );
 
+			std::string token = Lexer::ParseToken( it, end );
+			if ( token == "[" )
+			{
+				token = Lexer::ParseToken( it, end );
+				arraySize = TokenToScalarType<uint32_t>( token );
+				token = Lexer::ParseToken( it, end );
+				if ( token != "]" )
+					throw std::exception( "Expected '=' but got something else" );
+				token = Lexer::ParseToken( it, end );
+			}
+
+			if ( token == ";" )
+			{
+				AppendScalar< scalar_type >( 0, context.data, arraySize );
+				return;
+			}
+
+			if ( token != "=" )
+				throw std::exception( "Expected '=' but got something else" );
+
 			AppendScalar< scalar_type >( it, end, context.data );
+
+			token = Lexer::ParseToken( it, end );
+			if ( token != ";" )
+				throw std::exception( "Expected ';' but got something else" );
 		}
 
 		template< typename scalar_type >

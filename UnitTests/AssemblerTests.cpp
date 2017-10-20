@@ -42,7 +42,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingUInt8Variable )
 		{
-			context.source = "uint8 foo = 123";
+			context.source = "uint8 foo = 123;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -52,7 +52,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingUInt16Variable )
 		{
-			context.source = "uint16 foo = 12345";
+			context.source = "uint16 foo = 12345;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -62,7 +62,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingUInt32Variable )
 		{
-			context.source = "uint32 foo = 123456789";
+			context.source = "uint32 foo = 123456789;";
 
 			Yal::Assembler::Assemble( context );
 			
@@ -72,7 +72,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingUInt64Variable )
 		{
-			context.source = "uint64 foo = 123456789123";
+			context.source = "uint64 foo = 123456789123;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -82,7 +82,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingInt8Variable )
 		{
-			context.source = "int8 foo = -123";
+			context.source = "int8 foo = -123;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -92,7 +92,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingInt16Variable )
 		{
-			context.source = "int16 foo = -12345";
+			context.source = "int16 foo = -12345;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -102,7 +102,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingInt32Variable )
 		{
-			context.source = "int32 foo = -123456789";
+			context.source = "int32 foo = -123456789;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -112,7 +112,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestAddingCreatingInt64Variable )
 		{
-			context.source = "int64 foo = -123456789123";
+			context.source = "int64 foo = -123456789123;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -122,35 +122,35 @@ namespace UnitTests
 
 		TEST_METHOD( TestExceptionThrownOnNegativeNumberWhenOnlyPositiveNumbersAllowed )
 		{
-			context.source = "uint32 foo = -123456789";
+			context.source = "uint32 foo = -123456789;";
 
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
 		TEST_METHOD( TestExceptionThrownOnTooBigNumber)
 		{
-			context.source = "uint8 foo = 123456789";
+			context.source = "uint8 foo = 123456789;";
 
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
 		TEST_METHOD( TestExceptionThrownIfAssignmentOperatorIsMissing )
 		{
-			context.source = "uint8 foo 123456789";
+			context.source = "uint8 foo 123456789;";
 
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
 		TEST_METHOD( TestExceptionThrownWhenCreatingTwoVariablesByTheSameName )
 		{
-			context.source = "uint32 foo = 123456789\nuint32 foo = 123456789";
+			context.source = "uint32 foo = 123456789;\nuint32 foo = 123456789;";
 
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
 
 		TEST_METHOD( TestLoadEffectiveAddress )
 		{
-			context.source = "uint32 foo = 123456789\nlea r10, foo";
+			context.source = "uint32 foo = 123456789;\nlea r10, foo";
 
 			Yal::Assembler::Assemble( context );
 			Yal::Assembler::Disassemble( context, disassembledText );
@@ -160,7 +160,7 @@ namespace UnitTests
 
 		TEST_METHOD( TestExceptionIsThrownTryingToReferenceNonExistentVariable )
 		{
-			context.source = "uint32 foo = 123456789\nlea r10, bar";
+			context.source = "uint32 foo = 123456789;\nlea r10, bar";
 
 			Assert::ExpectException< std::exception >( [&] { Yal::Assembler::Assemble( context ); } );
 		}
@@ -960,9 +960,9 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "dfcast dfr10, r11\n" );
 		}
 
-		TEST_METHOD( TestAddingCreatingFloatPointVariable )
+		TEST_METHOD( TestCreatingFloatPointVariable )
 		{
-			context.source = "float foo = 123.0f";
+			context.source = "float foo = 123.0f;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -970,9 +970,9 @@ namespace UnitTests
 			Assert::IsTrue( *reinterpret_cast< float * >( &context.data[0] ) == 123.0f );
 		}
 
-		TEST_METHOD( TestAddingCreatingDoubleVariable )
+		TEST_METHOD( TestCreatingDoubleVariable )
 		{
-			context.source = "double foo = 123.0";
+			context.source = "double foo = 123.0;";
 
 			Yal::Assembler::Assemble( context );
 
@@ -1012,6 +1012,16 @@ namespace UnitTests
 			Yal::Assembler::Disassemble( context, disassembledText );
 
 			Assert::IsTrue( disassembledText == "dfldi dfr10, 100.000000\n" );
+		}
+
+		TEST_METHOD( TestArrayDeclaration )
+		{
+			context.source = "uint8 foo[4];";
+
+			Yal::Assembler::Assemble( context );
+
+			Assert::IsTrue( context.data.size() == 4 );
+			Assert::IsTrue( *reinterpret_cast< uint32_t * >( &context.data[0] ) == 0 );
 		}
 
 	private:
