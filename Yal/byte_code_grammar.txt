@@ -1,0 +1,140 @@
+registers:
+ 
+r0..r[n-1]				-> support for n registers
+
+rb[n]					-> means it is byte ( 8 bits)
+rw[n]					-> means it is word (16 bits)
+rd[n]					-> means is is a dword (32 bits)
+r[n]					-> means it is 64 bits (native on 64 bit machines)
+fr[n]					-> means 32 bits floating point
+dfr[n]					-> means 64 bits floating point
+sp						-> is the stack pointer
+ 
+spadd value				-> sp = sp + value
+spsub value				-> sp = sp - value
+ 
+ldi register, value		-> load immediate
+fldi register, value	-> load float immediate
+dfldi register, value	-> load double immediate
+ld register, $address	-> load value at address in register
+ 
+st register, $address	-> store value from register into address
+ 
+push register			-> push on the stack
+pop register			-> pop from the stack
+ 
+mv rA, rb				-> rA = rB
+and rA, rB, rC			-> rA = rB & rC
+or rA, rB, rC			-> rA = rB | rC
+xor rA, rB, rC			-> rA = rB ^ rC
+compl rA, rb			-> rA = ~rB (complement)
+ 
+land rA, rB, rC			-> rA = rB && rC
+lor rA, rB, rC			-> rA = rB || rC
+lnot rA, rb				-> rA = !rB
+ 
+cmpeq rA, rB			-> compare equal
+cmplt rA, rB			-> compare less than
+cmple rA, rB			-> compare less equal
+cmpgt rA, rB			-> compare greater than
+cmpge rA, rB			-> compare greater equal
+ 
+jmp $address			-> jump to address
+jmpt $address			-> jump if true
+ 
+call rA					-> push return address & jump to specified address
+ret						-> pop return address & jump to it
+ 
+add rA, rB, rC			-> rA = rB + rC
+sub rA, rB, rC			-> rA = rB - rC
+inc rA					-> rA = rA + 1
+dec rA					-> rA = rA - 1
+mul rA, rB, rC			-> rA = rB * rC
+div rA, rB, rC			-> rA = rB / rC
+abs rA, rB				-> rA = abs(rB)
+neg rA, rB				-> rA = -rB
+sr rA, rB, rC			-> rA = rB >> rC
+sl rA, rB, rC			-> rA = rB << rC
+casti rA, frA			-> rA = (int)frA
+ 
+fcmpeq frA, frB			-> compare equal
+fcmplt frA, frB			-> compare less than
+fcmple frA, frB			-> compare less equal
+fcmpgt frA, frB			-> compare greater than
+fcmpge frA, frB			-> compare greater equal
+ 
+fsqrt frA, frB			-> frA = sqrt(frB)
+fabs frA, frB			-> frA = abs(frB)
+fneg frA, frB			-> frA = -frB
+fcos frA, frB			-> frA = cos(frB)
+fsin frA, frB			-> frA = sin(frB)
+frnd frA, frB			-> frA = round(frB)
+fcast frA, rA			-> frA = (float)rA
+ 
+dfcmpeq dfrA, dfrB		-> compare equal
+dfcmplt dfrA, dfrB		-> compare less than
+dfcmple dfrA, dfrB		-> compare less equal
+dfcmpgt dfrA, dfrB		-> compare greater than
+dfcmpge dfrA, dfrB		-> compare greater equal
+ 
+dfsqrt dfrA, dfrB		-> dfrA = sqrt(dfrB)
+dfabs dfrA, dfrB		-> dfrA = abs(dfrB)
+dfneg dfrA, dfrB		-> dfrA = -dfrB
+dfcos dfrA, dfrB		-> dfrA = cos(dfrB)
+dfsin dfrA, dfrB		-> dfrA = sin(dfrB)
+dfrnd dfrA, dfrB		-> dfrA = round(dfrB)
+dfcast dfrA, rA			-> rA = (double)dfrA
+ 
+waitsig sig				-> save state of thread & wait for signal
+signal thread_id, sig	-> send signal to thread
+sleep ms				-> sleep for number of specified milliseconds
+ 
+data types:
+[u]int[8|16|32|64] variable_name [\[array_size\]]
+float-> 32 bits
+double-> 64 bits
+string-> 8 bit string
+wstring-> 16 bits string
+ 
+example:
+ 
+uint16 my_var = value-> declare a constant call my_var with value 'calue'
+uint64[256] func_table = { address1, address2, ... }-> declare a function table
+ 
+ncall rA-> native call of function in rA
+ 
+example call a c function
+uint8 printf = 1
+.
+.
+.
+ 
+ld rA, core_c[printf]
+ncall rA-> call function in rA. Function arguments are in r0, r1, r2, etc
+ 
+function name-> declares a function object
+:label_name-> declares a label by that name (to be used by jump)
+ 
+ 
+struct thread
+{
+ // registers
+ int64 r[10];
+ byte *mem;
+ byte *prog;
+};
+ 
+ 
+void Assembler( const std::string &text, std::vector< byte > &prog )
+{
+ auto it = begin(text);
+ auto end = end(text);
+ 
+ while ( it != end )
+ {
+ const auto &token = ParseToken( it );
+ cons TokenId tokenId = TokenToTokenId( token );
+ tokenParsers[TokenId].Assemble( it, prog );
+ }
+ tokenParsers[TOKEN_RETURN].Assemble( it, prog );
+}
