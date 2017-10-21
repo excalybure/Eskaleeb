@@ -101,6 +101,7 @@
     </ClCompile>
     <ClCompile Include="LexerTests.cpp" />
     <ClCompile Include="TokenizerTests.cpp" />
+    <ClCompile Include="YalVMTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

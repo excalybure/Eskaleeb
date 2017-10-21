@@ -8,6 +8,7 @@
 #pragma warning ( disable : 4710 )		// function not inlined
 #pragma warning ( disable : 4628 )		// digraphs not supported with -Ze. Character sequence '<:' not interpreted as alternate token for '['
 #pragma warning ( disable : 4464 )		// relative include path contains '..'
+#pragma warning ( disable : 4514 )		// nreferenced inline function has been removed
 
 #pragma warning ( push )
 #pragma warning ( disable : 4668 )		// is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'

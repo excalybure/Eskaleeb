@@ -87,6 +87,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Tokenizer.h" />
     <ClInclude Include="Assembler.h" />
+    <ClInclude Include="YalVM.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assembler.cpp" />
@@ -97,6 +98,10 @@
     </ClCompile>
     <ClCompile Include="Tokenizer.cpp" />
     <ClCompile Include="Yal.cpp" />
+    <ClCompile Include="YalVM.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="byte_code_grammar.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
