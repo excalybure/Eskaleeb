@@ -27,5 +27,8 @@ namespace Yal
 		std::vector< uint8_t >	data;
 		std::vector< uint64_t >	registers;
 		std::vector< double >	floatRegisters;
+		size_t					ip;
+
+		void RegisterLoad();
 	};
 }
