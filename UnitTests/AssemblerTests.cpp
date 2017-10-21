@@ -1024,6 +1024,16 @@ namespace UnitTests
 			Assert::IsTrue( *reinterpret_cast< uint32_t * >( &context.data[0] ) == 0 );
 		}
 
+		TEST_METHOD( TestArrayDeclarationWithInitialization )
+		{
+			context.source = "uint8 foo[4] = { 0, 1, 2, 3 };";
+
+			Yal::Assembler::Assemble( context );
+
+			Assert::IsTrue( context.data.size() == 4 );
+			Assert::IsTrue( *reinterpret_cast< uint32_t * >( &context.data[0] ) == 0x03020100 );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		std::string disassembledText;

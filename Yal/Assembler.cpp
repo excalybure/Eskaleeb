@@ -506,10 +506,18 @@ namespace Yal
 			AppendScalar< int32_t >( address, context.byteCode );
 		}
 
+		static void ExpectToken( std::string::const_iterator &it, const std::string::const_iterator &end, const char *expectedToken )
+		{
+			std::string token = Lexer::ParseToken( it, end );
+			if ( token != expectedToken )
+				throw std::exception( "Syntax error. Got unexpected token" );
+		}
+
 		template< typename scalar_type >
 		static void ParseVariableDefinition( Context &context, std::string::const_iterator &it, const std::string::const_iterator &end )
 		{
 			size_t arraySize = 1;
+			bool isArray = false;
 
 			std::string variableName = Lexer::ParseToken( it, end );
 
@@ -520,11 +528,10 @@ namespace Yal
 			std::string token = Lexer::ParseToken( it, end );
 			if ( token == "[" )
 			{
+				isArray = true;
 				token = Lexer::ParseToken( it, end );
 				arraySize = TokenToScalarType<uint32_t>( token );
-				token = Lexer::ParseToken( it, end );
-				if ( token != "]" )
-					throw std::exception( "Expected '=' but got something else" );
+				ExpectToken( it, end, "]" );
 				token = Lexer::ParseToken( it, end );
 			}
 
@@ -537,11 +544,23 @@ namespace Yal
 			if ( token != "=" )
 				throw std::exception( "Expected '=' but got something else" );
 
-			AppendScalar< scalar_type >( it, end, context.data );
+			if ( isArray )
+			{
+				ExpectToken( it, end, "{" );
+				for ( size_t elementIndex = 0; elementIndex < arraySize; ++elementIndex )
+				{
+					if ( elementIndex != 0 )
+						ExpectToken( it, end, "," );
+					AppendScalar< scalar_type >( it, end, context.data );
+				}
+				ExpectToken( it, end, "}" );
+			}
+			else
+			{
+				AppendScalar< scalar_type >( it, end, context.data );
+			}
 
-			token = Lexer::ParseToken( it, end );
-			if ( token != ";" )
-				throw std::exception( "Expected ';' but got something else" );
+			ExpectToken( it, end, ";" );
 		}
 
 		template< typename scalar_type >
