@@ -21,6 +21,7 @@ namespace Yal
 
 		uint64_t getRegisterValue( size_t index ) const { return registers[index]; }
 		double getFloatRegisterValue( size_t index ) const { return floatRegisters[index]; }
+		const std::vector< uint8_t > &getData() const { return data; }
 
 	private:
 		std::vector< uint8_t >	byteCode;
