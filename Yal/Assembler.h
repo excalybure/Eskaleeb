@@ -11,11 +11,14 @@ namespace Yal
 		INSTR_CODE_SP_SUB,
 
 		INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,
+		INSTR_CODE_LOAD_CODE_ADDRESS,
 		INSTR_CODE_LOAD_IMMEDIATE,
 		INSTR_CODE_FLOAT_LOAD_IMMEDIATE,
 		INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,
 		INSTR_CODE_LOAD,
+		INSTR_CODE_LOAD_ADDRESS,
 		INSTR_CODE_STORE,
+		INSTR_CODE_STORE_ADDRESS,
 
 		INSTR_CODE_PUSH,
 		INSTR_CODE_POP,
@@ -54,6 +57,7 @@ namespace Yal
 
 		INSTR_CODE_CALL,
 		INSTR_CODE_CALL_INDIRECT,
+		INSTR_CODE_CALL_NATIVE,
 		INSTR_CODE_RETURN,
 
 		INSTR_CODE_ADD,
@@ -111,18 +115,21 @@ namespace Yal
 		REGISTER_TYPE_INVALID
 	};
 
+	using NameToAddressMap = std::unordered_map< std::string, int >;
+
 	namespace Assembler
 	{
 		struct Context
 		{
-			using NameToAddressMap = std::unordered_map< std::string, int >;
 			using AddressToNameMap = std::unordered_map< int, std::string >;
+			using LabelCall = std::tuple< std::string, size_t >;
 
 			std::string				source;
 			std::vector< uint8_t >	byteCode;
 			std::vector< uint8_t >	data;
 			NameToAddressMap		variables;
 			NameToAddressMap		labels;
+			std::vector< LabelCall > deferredLabelResolutions;
 		};
 
 		void Assemble( Context &context );

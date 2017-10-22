@@ -26,7 +26,7 @@ namespace Yal
 
 		static bool isLiteralCharacter( const char c )
 		{
-			return isalnum( c ) != 0;
+			return isalnum( c ) != 0 || c == '_';
 		}
 
 		std::string ParseToken( std::string::const_iterator &it, const std::string::const_iterator &end )

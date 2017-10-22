@@ -66,11 +66,14 @@ namespace Yal
 			INSTR_CODE_SP_SUB,					// TOKEN_SP_SUB,
 
 			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,	// TOKEN_LOAD_EFFECTIVE_ADDRESS,
+			INSTR_CODE_LOAD_CODE_ADDRESS,		// TOKEN_LOAD_CODE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,			// TOKEN_LOAD_IMMEDIATE,
 			INSTR_CODE_FLOAT_LOAD_IMMEDIATE,	// TOKEN_FLOAT_LOAD_IMMEDIATE,
 			INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,	// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,					// TOKEN_LOAD,
+			INSTR_CODE_LOAD_ADDRESS,			// TOKEN_LOAD_ADDRESS,
 			INSTR_CODE_STORE,					// TOKEN_STORE,
+			INSTR_CODE_STORE_ADDRESS,			// TOKEN_STORE_ADDRESS,
 
 			INSTR_CODE_PUSH,					// TOKEN_PUSH,
 			INSTR_CODE_POP,						// TOKEN_POP,
@@ -109,6 +112,7 @@ namespace Yal
 
 			INSTR_CODE_CALL,					// TOKEN_CALL,
 			INSTR_CODE_CALL_INDIRECT,			// TOKEN_CALL_INDIRECT,
+			INSTR_CODE_CALL_NATIVE,				// TOKEN_CALL_NATIVE,
 			INSTR_CODE_RETURN,					// TOKEN_RETURN,
 
 			INSTR_CODE_ADD,						// TOKEN_ADD,
@@ -176,11 +180,14 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_SUB,
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_EFFECTIVE_ADDRESS,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_CODE_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_INT ),							// TOKEN_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT ),					// TOKEN_FLOAT_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_DOUBLE_REGISTER, ARG_TYPE_DOUBLE ),				// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_LOAD,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_STORE,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_STORE_ADDRESS,
 
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_PUSH,
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_POP,
@@ -219,6 +226,7 @@ namespace Yal
 
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_CALL,
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_INDIRECT_CALL,
+			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_NATIVE_CALL,
 			InstructionDesc(),															// TOKEN_RETURN,
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_ADD,
@@ -265,11 +273,14 @@ namespace Yal
 			"spsub",		// INSTR_CODE_SP_SUB,
 
 			"lea",			// INSTR_CODE_LOAD_EFFECTIVE_ADDRESS
+			"lca",			// INSTR_CODE_LOAD_CODE_ADDRESS
 			"ldi",			// INSTR_CODE_LOAD_IMMEDIATE,
 			"fldi",			// INSTR_CODE_FLOAT_LOAD_IMMEDIATE,
 			"dfldi",		// INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,
 			"ld",			// INSTR_CODE_LOAD,
+			"lda",			// INSTR_CODE_LOAD_ADDRESS,
 			"st",			// INSTR_CODE_STORE,
+			"sta",			// INSTR_CODE_STORE_ADDRESS,
 
 			"push",			// INSTR_CODE_PUSH,
 			"pop",			// INSTR_CODE_POP,
@@ -308,6 +319,7 @@ namespace Yal
 
 			"call",			// INSTR_CODE_CALL,
 			"calli",		// INSTR_CODE_CALL_INDIRECT,
+			"calln",		// INSTR_CODE_CALL_NATIVE,
 			"ret",			// INSTR_CODE_RETURN,
 
 			"add",			// INSTR_CODE_ADD,
@@ -391,13 +403,19 @@ namespace Yal
 			AppendScalar< scalar_type >( token, buffer );
 		}
 
-		static void AppendAddress( Context &context, const std::string &variableName, Context::NameToAddressMap &nameToAdressMap )
+		static void AppendAddress( Context &context, const std::string &variableName )
 		{
-			if ( nameToAdressMap.find( variableName ) == nameToAdressMap.cend() )
+			if ( context.variables.find( variableName ) == context.variables.cend() )
 				throw std::exception( "Trying to reference an unknown variable" );
 
-			int address = nameToAdressMap[variableName];
+			int address = context.variables[variableName];
 			AppendScalar< int32_t >( address, context.byteCode );
+		}
+
+		static void HandleCodeLabel( Context &context, const std::string &labelName )
+		{
+			context.deferredLabelResolutions.emplace_back( labelName, context.byteCode.size() );
+			AppendScalar< int32_t >( 0, context.byteCode );
 		}
 
 		static void ExpectToken( std::string::const_iterator &it, const std::string::const_iterator &end, const char *expectedToken )
@@ -479,6 +497,7 @@ namespace Yal
 		{
 			switch ( code )
 			{
+			case INSTR_CODE_LOAD_CODE_ADDRESS:
 			case INSTR_CODE_JUMP:
 			case INSTR_CODE_JUMP_IF_TRUE:
 			case INSTR_CODE_CALL:
@@ -661,9 +680,9 @@ namespace Yal
 							break;
 						case ARG_TYPE_ADDRESS:
 							if ( WantsCodeAddress( code ) )
-								AppendAddress( context, token, context.labels );
+								HandleCodeLabel( context, token );
 							else
-								AppendAddress( context, token, context.variables );
+								AppendAddress( context, token );
 							break;
 						}
 					}
@@ -711,6 +730,16 @@ namespace Yal
 				}
 			}
 
+			for ( const auto &label : context.deferredLabelResolutions )
+			{
+				const auto labelIt = context.labels.find( std::get< 0 >( label ) );
+				if ( labelIt == context.labels.cend() )
+					throw std::exception( "Trying to reference an unknown variable" );
+
+				int address = labelIt->second;
+				memcpy( &context.byteCode[std::get< 1 >( label )], &address, sizeof( address ) );
+			}
+
 			context.byteCode.shrink_to_fit();
 		}
 
@@ -719,7 +748,7 @@ namespace Yal
 			Context::AddressToNameMap addressToVariableNameMap;
 			Context::AddressToNameMap addressToLabelNameMap;
 
-			auto computeAddressToNameMap = [] ( const Context::NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
+			auto computeAddressToNameMap = [] ( const NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
 			{
 				addressToNameMap.reserve( nameToAddressMap.size() );
 				for ( const auto &nameToAdress : nameToAddressMap )
@@ -791,6 +820,17 @@ namespace Yal
 				text += std::to_string( registerIndex );
 			};
 
+			auto appendLabel = [&addressToLabelNameMap] ( const Context &context, std::string &text, std::vector< uint8_t >::const_iterator &codeIt )
+			{
+				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), codeIt ) ) );
+				if ( labelIt != addressToLabelNameMap.cend() )
+				{
+					text += ":";
+					text += labelIt->second;
+					text += "\n";
+				}
+			};
+
 			text.clear();
 			text.reserve( 1 * MB );
 
@@ -804,13 +844,7 @@ namespace Yal
 			{
 				RegisterType registerType = REGISTER_TYPE_DWORD;
 
-				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), it ) ) );
-				if ( labelIt != addressToLabelNameMap.cend() )
-				{
-					text += ":";
-					text += labelIt->second;
-					text += "\n";
-				}
+				appendLabel( context, text, it );
 
 				InstructionCode code = static_cast< InstructionCode >( *it );
 				++it;
@@ -882,6 +916,8 @@ namespace Yal
 
 				text += '\n';
 			}
+
+			appendLabel( context, text, it );
 
 			text.shrink_to_fit();
 		}

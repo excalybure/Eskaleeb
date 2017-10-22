@@ -16,9 +16,11 @@ spsub value				-> sp = sp - value
 ldi register, value		-> load immediate
 fldi register, value	-> load float immediate
 dfldi register, value	-> load double immediate
-ld register, $address	-> load value at address in register
+ld register, register	-> load value at address from register in register
+lda register, $address	-> load value at address in register
  
-st register, $address	-> store value from register into address
+st register, register	-> store value from register into address from register
+sta register, $address	-> store value from register into address
  
 push register			-> push on the stack
 pop register			-> pop from the stack
@@ -43,6 +45,7 @@ jmp $address			-> jump to address
 jmpt $address			-> jump if true
  
 call rA					-> push return address & jump to specified address
+calln $address			-> call native function at address
 ret						-> pop return address & jump to it
  
 add rA, rB, rC			-> rA = rB + rC
@@ -62,7 +65,11 @@ fcmplt frA, frB			-> compare less than
 fcmple frA, frB			-> compare less equal
 fcmpgt frA, frB			-> compare greater than
 fcmpge frA, frB			-> compare greater equal
- 
+
+fadd frA, frB, frC		-> frA = frB + frC
+fsub frA, frB, frC		-> frA = frB - frC
+fmul frA, frB, frC		-> frA = frB * frC
+fdiv frA, frB, frC		-> frA = frB / frC
 fsqrt frA, frB			-> frA = sqrt(frB)
 fabs frA, frB			-> frA = abs(frB)
 fneg frA, frB			-> frA = -frB
@@ -101,7 +108,7 @@ example:
 uint16 my_var = value-> declare a constant call my_var with value 'calue'
 uint64[256] func_table = { address1, address2, ... }-> declare a function table
  
-ncall rA-> native call of function in rA
+calln rA-> native call of function in rA
  
 example call a c function
 uint8 printf = 1
@@ -110,7 +117,7 @@ uint8 printf = 1
 .
  
 ld rA, core_c[printf]
-ncall rA-> call function in rA. Function arguments are in r0, r1, r2, etc
+calln rA-> call function in rA. Function arguments are in r0, r1, r2, etc
  
 function name-> declares a function object
 :label_name-> declares a label by that name (to be used by jump)

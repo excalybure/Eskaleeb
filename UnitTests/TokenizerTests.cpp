@@ -61,16 +61,40 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOAD_IMMEDIATE == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
+		TEST_METHOD( TestLoadEffectiveAddress )
+		{
+			std::string token( "lea" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOAD_EFFECTIVE_ADDRESS == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestLoadEffectiveFunctionAddress )
+		{
+			std::string token( "lca" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOAD_CODE_ADDRESS == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestLoad )
 		{
 			std::string token( "ld" );
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOAD == Yal::Lexer::TokenToTokenId( token ) );
 		}
 		
+		TEST_METHOD( TestLoadAddress )
+		{
+			std::string token( "lda" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_LOAD_ADDRESS == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestStore )
 		{
 			std::string token( "st" );
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_STORE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestStoreAtAddress )
+		{
+			std::string token( "sta" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_STORE_ADDRESS == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestFloatLoadImmediate )
@@ -233,6 +257,12 @@ namespace UnitTests
 		{
 			std::string token( "calli" );
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_CALL_INDIRECT == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
+		TEST_METHOD( TestCallNative)
+		{
+			std::string token( "calln" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_CALL_NATIVE == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
 		TEST_METHOD( TestReturn )
