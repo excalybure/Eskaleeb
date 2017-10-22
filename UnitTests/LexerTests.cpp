@@ -84,6 +84,26 @@ namespace UnitTests
 			Assert::IsTrue( token == "Hello123" );
 		}
 
+		TEST_METHOD( TestLiteralTokensCanContainUnderScore )
+		{
+			std::string token;
+			std::string testString = "Hello_123";
+			auto it = testString.cbegin();
+
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
+			Assert::IsTrue( token == "Hello_123" );
+		}
+
+		TEST_METHOD( TestLiteralTokenCanStartWIthUnderScore )
+		{
+			std::string token;
+			std::string testString = "_foo";
+			auto it = testString.cbegin();
+
+			token = Yal::Lexer::ParseToken( it, testString.cend() );
+			Assert::IsTrue( token == "_foo" );
+		}
+
 		TEST_METHOD( TestLiteralThrowsExceptionOnInvalidNumber )
 		{
 			std::string token;

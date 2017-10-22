@@ -66,12 +66,14 @@ namespace Yal
 			INSTR_CODE_SP_SUB,					// TOKEN_SP_SUB,
 
 			INSTR_CODE_LOAD_EFFECTIVE_ADDRESS,	// TOKEN_LOAD_EFFECTIVE_ADDRESS,
+			INSTR_CODE_LOAD_CODE_ADDRESS,		// TOKEN_LOAD_CODE_ADDRESS,
 			INSTR_CODE_LOAD_IMMEDIATE,			// TOKEN_LOAD_IMMEDIATE,
 			INSTR_CODE_FLOAT_LOAD_IMMEDIATE,	// TOKEN_FLOAT_LOAD_IMMEDIATE,
 			INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,	// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			INSTR_CODE_LOAD,					// TOKEN_LOAD,
+			INSTR_CODE_LOAD_ADDRESS,			// TOKEN_LOAD_ADDRESS,
 			INSTR_CODE_STORE,					// TOKEN_STORE,
-			INSTR_CODE_STORE_IMMEDIATE,			// TOKEN_STORE_IMMEDIATE,
+			INSTR_CODE_STORE_ADDRESS,			// TOKEN_STORE_ADDRESS,
 
 			INSTR_CODE_PUSH,					// TOKEN_PUSH,
 			INSTR_CODE_POP,						// TOKEN_POP,
@@ -110,6 +112,7 @@ namespace Yal
 
 			INSTR_CODE_CALL,					// TOKEN_CALL,
 			INSTR_CODE_CALL_INDIRECT,			// TOKEN_CALL_INDIRECT,
+			INSTR_CODE_CALL_NATIVE,				// TOKEN_CALL_NATIVE,
 			INSTR_CODE_RETURN,					// TOKEN_RETURN,
 
 			INSTR_CODE_ADD,						// TOKEN_ADD,
@@ -177,12 +180,14 @@ namespace Yal
 			InstructionDesc( ARG_TYPE_INT ),											// TOKEN_SP_SUB,
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_EFFECTIVE_ADDRESS,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_CODE_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_INT ),							// TOKEN_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_FLOAT_REGISTER, ARG_TYPE_FLOAT ),					// TOKEN_FLOAT_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_DOUBLE_REGISTER, ARG_TYPE_DOUBLE ),				// TOKEN_DOUBLE_LOAD_IMMEDIATE,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_LOAD,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_LOAD_ADDRESS,
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),					// TOKEN_STORE,
-			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_STORE_IMMEDIATE,
+			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_ADDRESS ),						// TOKEN_STORE_ADDRESS,
 
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_PUSH,
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_POP,
@@ -221,6 +226,7 @@ namespace Yal
 
 			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_CALL,
 			InstructionDesc( ARG_TYPE_REGISTER ),										// TOKEN_INDIRECT_CALL,
+			InstructionDesc( ARG_TYPE_ADDRESS ),										// TOKEN_NATIVE_CALL,
 			InstructionDesc(),															// TOKEN_RETURN,
 
 			InstructionDesc( ARG_TYPE_REGISTER, ARG_TYPE_REGISTER, ARG_TYPE_REGISTER ),	// TOKEN_ADD,
@@ -267,12 +273,14 @@ namespace Yal
 			"spsub",		// INSTR_CODE_SP_SUB,
 
 			"lea",			// INSTR_CODE_LOAD_EFFECTIVE_ADDRESS
+			"lca",			// INSTR_CODE_LOAD_CODE_ADDRESS
 			"ldi",			// INSTR_CODE_LOAD_IMMEDIATE,
 			"fldi",			// INSTR_CODE_FLOAT_LOAD_IMMEDIATE,
 			"dfldi",		// INSTR_CODE_DOUBLE_LOAD_IMMEDIATE,
 			"ld",			// INSTR_CODE_LOAD,
+			"lda",			// INSTR_CODE_LOAD_ADDRESS,
 			"st",			// INSTR_CODE_STORE,
-			"sti",			// INSTR_CODE_STORE_IMMEDIATE,
+			"sta",			// INSTR_CODE_STORE_ADDRESS,
 
 			"push",			// INSTR_CODE_PUSH,
 			"pop",			// INSTR_CODE_POP,
@@ -311,6 +319,7 @@ namespace Yal
 
 			"call",			// INSTR_CODE_CALL,
 			"calli",		// INSTR_CODE_CALL_INDIRECT,
+			"calln",		// INSTR_CODE_CALL_NATIVE,
 			"ret",			// INSTR_CODE_RETURN,
 
 			"add",			// INSTR_CODE_ADD,
@@ -488,6 +497,7 @@ namespace Yal
 		{
 			switch ( code )
 			{
+			case INSTR_CODE_LOAD_CODE_ADDRESS:
 			case INSTR_CODE_JUMP:
 			case INSTR_CODE_JUMP_IF_TRUE:
 			case INSTR_CODE_CALL:
@@ -738,7 +748,7 @@ namespace Yal
 			Context::AddressToNameMap addressToVariableNameMap;
 			Context::AddressToNameMap addressToLabelNameMap;
 
-			auto computeAddressToNameMap = [] ( const Context::NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
+			auto computeAddressToNameMap = [] ( const NameToAddressMap &nameToAddressMap, Context::AddressToNameMap &addressToNameMap )
 			{
 				addressToNameMap.reserve( nameToAddressMap.size() );
 				for ( const auto &nameToAdress : nameToAddressMap )

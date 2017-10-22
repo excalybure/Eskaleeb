@@ -158,6 +158,16 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "lea r10, foo\n" );
 		}
 
+		TEST_METHOD( TestLoadCodeAddress )
+		{
+			context.source = "\nlca r10, foo\n:foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "lca r10, foo\n:foo\n" );
+		}
+
 		TEST_METHOD( TestExceptionIsThrownTryingToReferenceNonExistentVariable )
 		{
 			context.source = "uint32 foo = 123456789;\nlea r10, bar";
@@ -282,14 +292,14 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "st r10, r11\n" );
 		}
 
-		TEST_METHOD( TestStoreImmediate )
+		TEST_METHOD( TestStoreAtAddress )
 		{
-			context.source = "int64 foo;\nsti r10, foo";
+			context.source = "int64 foo;\nsta r10, foo";
 
 			Yal::Assembler::Assemble( context );
 			Yal::Assembler::Disassemble( context, disassembledText );
 
-			Assert::IsTrue( disassembledText == "sti r10, foo\n" );
+			Assert::IsTrue( disassembledText == "sta r10, foo\n" );
 		}
 
 		TEST_METHOD( TestPush )
@@ -607,6 +617,16 @@ namespace UnitTests
 			Yal::Assembler::Disassemble( context, disassembledText );
 
 			Assert::IsTrue( disassembledText == "calli r11\n" );
+		}
+
+		TEST_METHOD( TestNativeCall )
+		{
+			context.source = "int64 foo;calln foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "calln foo\n" );
 		}
 
 		TEST_METHOD( TestReturn )

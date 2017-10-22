@@ -27,7 +27,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 			
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -10000000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
@@ -39,7 +39,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -100 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
@@ -51,7 +51,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -1000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
@@ -63,7 +63,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -100000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
@@ -75,7 +75,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 10000000 == vm.GetRegisterValue( 0 ) );
@@ -87,7 +87,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100 == vm.GetRegisterValue( 0 ) );
@@ -99,7 +99,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1000 == vm.GetRegisterValue( 0 ) );
@@ -111,7 +111,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == vm.GetRegisterValue( 0 ) );
@@ -123,7 +123,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == vm.GetFloatRegisterValue( 0 ) );
@@ -135,7 +135,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == vm.GetFloatRegisterValue( 0 ) );
@@ -147,7 +147,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == vm.GetRegisterValue( 1 ) );
@@ -159,19 +159,31 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == *reinterpret_cast< const int64_t * >( &vm.GetData()[0] ) );
 		}
 
-		TEST_METHOD( TestStoreImmediate )
+		TEST_METHOD( TestLoadAtAddress )
 		{
-			context.source = "int64 foo; ldi r0, 100000\nsti r0, foo";
+			context.source = "int64 foo = 123; lda r0, foo";
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.Run();
+
+			Assert::IsTrue( 123 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestStoreAtAddress )
+		{
+			context.source = "int64 foo; ldi r0, 100000\nsta r0, foo";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 100000 == *reinterpret_cast< const int64_t * >( &vm.GetData()[0] ) );
@@ -183,7 +195,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 4 == vm.GetRegisterValue( 0 ) );
@@ -195,7 +207,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 2 == vm.GetRegisterValue( 0 ) );
@@ -207,7 +219,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetRegisterValue( 1 ) );
@@ -219,7 +231,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -3 == vm.GetRegisterValue( 1 ) );
@@ -231,7 +243,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 4 == vm.GetRegisterValue( 2 ) );
@@ -243,7 +255,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 64 == vm.GetRegisterValue( 2 ) );
@@ -255,7 +267,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 7 == vm.GetRegisterValue( 2 ) );
@@ -267,7 +279,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 2 == vm.GetRegisterValue( 2 ) );
@@ -279,7 +291,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 12 == vm.GetRegisterValue( 2 ) );
@@ -291,7 +303,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetRegisterValue( 2 ) );
@@ -303,7 +315,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 123 == vm.GetRegisterValue( 0 ) );
@@ -315,7 +327,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 2 == vm.GetRegisterValue( 2 ) );
@@ -327,7 +339,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetRegisterValue( 2 ) );
@@ -339,7 +351,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
@@ -351,7 +363,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -128 == vm.GetRegisterValue( 1 ) );
@@ -365,7 +377,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
@@ -378,7 +390,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
@@ -392,7 +404,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 2 ) );
@@ -406,7 +418,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 1 ) );
@@ -428,7 +440,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -449,7 +461,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -470,7 +482,7 @@ namespace UnitTests
 
 				Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -491,7 +503,7 @@ namespace UnitTests
 
 				Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -512,7 +524,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -533,7 +545,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -554,7 +566,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -575,7 +587,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -596,7 +608,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -617,7 +629,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -629,7 +641,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 7 == vm.GetFloatRegisterValue( 2 ) );
@@ -641,7 +653,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -1 == vm.GetFloatRegisterValue( 2 ) );
@@ -653,7 +665,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 12 == vm.GetFloatRegisterValue( 2 ) );
@@ -665,7 +677,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 2 ) );
@@ -677,7 +689,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 1 ) );
@@ -689,7 +701,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -3 == vm.GetFloatRegisterValue( 1 ) );
@@ -701,7 +713,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( static_cast< float >( cos( 3 ) ) == vm.GetFloatRegisterValue( 1 ) );
@@ -713,7 +725,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( static_cast< float >( sin( 3 ) ) == vm.GetFloatRegisterValue( 1 ) );
@@ -725,7 +737,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 5 == vm.GetFloatRegisterValue( 1 ) );
@@ -737,7 +749,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 4 == vm.GetFloatRegisterValue( 1 ) );
@@ -749,7 +761,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 0 ) );
@@ -770,7 +782,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -791,7 +803,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -812,7 +824,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -833,7 +845,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -854,7 +866,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -875,7 +887,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -896,7 +908,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -917,7 +929,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -938,7 +950,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -959,7 +971,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -971,7 +983,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 7 == vm.GetFloatRegisterValue( 2 ) );
@@ -983,7 +995,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -1 == vm.GetFloatRegisterValue( 2 ) );
@@ -995,7 +1007,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 12 == vm.GetFloatRegisterValue( 2 ) );
@@ -1007,7 +1019,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 2 ) );
@@ -1019,7 +1031,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 1 ) );
@@ -1031,7 +1043,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( -3 == vm.GetFloatRegisterValue( 1 ) );
@@ -1043,7 +1055,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( cos( 3 ) == vm.GetFloatRegisterValue( 1 ) );
@@ -1055,7 +1067,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( sin( 3 ) == vm.GetFloatRegisterValue( 1 ) );
@@ -1067,7 +1079,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 5 == vm.GetFloatRegisterValue( 1 ) );
@@ -1079,7 +1091,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 4 == vm.GetFloatRegisterValue( 1 ) );
@@ -1091,7 +1103,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 0 ) );
@@ -1112,7 +1124,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -1133,7 +1145,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -1154,7 +1166,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -1175,7 +1187,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -1196,7 +1208,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -1217,7 +1229,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -1238,7 +1250,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -1259,7 +1271,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
@@ -1280,7 +1292,7 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
@@ -1301,13 +1313,90 @@ namespace UnitTests
 
 			Yal::Assembler::Assemble( context );
 
-			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
 			vm.Run();
 
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
+
+		TEST_METHOD( TestReturnEndProgramEvaluation )
+		{
+			context.source = R"(
+					ldi r0, 1
+					ret
+					ldi r0, 0)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestCall )
+		{
+			context.source = R"(
+					call my_fun
+					ret
+				:my_fun
+					ldi r0, 1
+					ret)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestCallIndirect )
+		{
+			context.source = R"(
+					lca r1, my_fun
+					calli r1
+					ret
+				:my_fun
+					ldi r0, 1
+					ret)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestCallNativeFunction )
+		{
+			context.source = R"(
+				uint64 native_fun;
+				uint64 native_this;
+					lda r0, native_this
+					calln native_fun)";
+
+			Yal::Assembler::Assemble( context );
+
+			nativeFunctionCalled = false;
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.SetData( "native_fun", reinterpret_cast< int64_t >( NativeFunction ) );
+			vm.SetData( "native_this", reinterpret_cast< int64_t >( this ) );
+			vm.Run();
+
+			Assert::IsTrue( nativeFunctionCalled );
+		}
 	private:
 		Yal::Assembler::Context context;
 		Yal::VM vm;
+		bool nativeFunctionCalled;
+
+		static void NativeFunction( const Yal::VM &vm )
+		{
+			YalVMTests *This = reinterpret_cast< YalVMTests *>( vm.GetRegisterValue( 0 ) );
+			This->nativeFunctionCalled = true;
+		}
 	};
 }

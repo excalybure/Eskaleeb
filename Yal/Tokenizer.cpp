@@ -14,12 +14,14 @@ namespace Yal
 			s_tokenToTokenIdMap["spsub"] = TokenId::TOKEN_SP_SUB;
 
 			s_tokenToTokenIdMap["lea"] = TokenId::TOKEN_LOAD_EFFECTIVE_ADDRESS;
+			s_tokenToTokenIdMap["lca"] = TokenId::TOKEN_LOAD_CODE_ADDRESS;
 			s_tokenToTokenIdMap["ldi"] = TokenId::TOKEN_LOAD_IMMEDIATE;
 			s_tokenToTokenIdMap["fldi"] = TokenId::TOKEN_FLOAT_LOAD_IMMEDIATE;
 			s_tokenToTokenIdMap["dfldi"] = TokenId::TOKEN_DOUBLE_LOAD_IMMEDIATE;
 			s_tokenToTokenIdMap["ld"] = TokenId::TOKEN_LOAD;
+			s_tokenToTokenIdMap["lda"] = TokenId::TOKEN_LOAD_ADDRESS;
 			s_tokenToTokenIdMap["st"] = TokenId::TOKEN_STORE;
-			s_tokenToTokenIdMap["sti"] = TokenId::TOKEN_STORE_IMMEDIATE;
+			s_tokenToTokenIdMap["sta"] = TokenId::TOKEN_STORE_ADDRESS;
 			s_tokenToTokenIdMap["push"] = TokenId::TOKEN_PUSH;
 			s_tokenToTokenIdMap["pop"] = TokenId::TOKEN_POP;
 
@@ -57,6 +59,7 @@ namespace Yal
 
 			s_tokenToTokenIdMap["call"] = TokenId::TOKEN_CALL;
 			s_tokenToTokenIdMap["calli"] = TokenId::TOKEN_CALL_INDIRECT;
+			s_tokenToTokenIdMap["calln"] = TokenId::TOKEN_CALL_NATIVE;
 			s_tokenToTokenIdMap["ret"] = TokenId::TOKEN_RETURN;
 
 			s_tokenToTokenIdMap["add"] = TokenId::TOKEN_ADD;

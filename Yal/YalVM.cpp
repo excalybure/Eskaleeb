@@ -28,17 +28,23 @@ namespace Yal
 		return static_cast< int64_t >( value & 0x7fffffffffffffff );
 	}
 
-	template< typename scalar_type >
-	static scalar_type LoadImmediate( const std::vector< uint8_t > &byteCode, size_t &ip )
+	template< typename scalar_type, bool atAddress > scalar_type VM::Load()
 	{
 		scalar_type value;
 
-		memcpy( &value, &byteCode[ip], sizeof( value ) );
-		ip += sizeof( value );
+		if ( atAddress )
+		{
+			memcpy( &value, &data[GetAddress()], sizeof( value ) );
+		}
+		else
+		{
+			memcpy( &value, &byteCode[ip], sizeof( value ) );
+			ip += sizeof( value );
+		}
 		return value;
 	}
 
-	void VM::RegisterLoad()
+	template< bool atAddress > void VM::RegisterLoad()
 	{
 		RegisterType registerType = static_cast< RegisterType >( byteCode[ip++] );
 		uint8_t registerIndex = byteCode[ip++];
@@ -46,34 +52,34 @@ namespace Yal
 		switch ( registerType )
 		{
 		case REGISTER_TYPE_BYTE:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< int8_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< int8_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_UNSIGNED_BYTE:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< uint8_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< uint8_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_WORD:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< int16_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< int16_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_UNSIGNED_WORD:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< uint16_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< uint16_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_DWORD:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< int32_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< int32_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_UNSIGNED_DWORD:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< uint32_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< uint32_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_NATIVE:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< int64_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< int64_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_UNSIGNED_NATIVE:
-			registers[registerIndex] = static_cast< int64_t >( LoadImmediate< uint64_t >( byteCode, ip ) );
+			registers[registerIndex] = static_cast< int64_t >( Load< uint64_t, atAddress >() );
 			break;
 		case REGISTER_TYPE_FLOAT:
-			floatRegisters[registerIndex] = LoadImmediate< float >( byteCode, ip );
+			floatRegisters[registerIndex] = Load< float, atAddress >();
 			break;
 		case REGISTER_TYPE_DOUBLE:
-			floatRegisters[registerIndex] = LoadImmediate< double >( byteCode, ip );
+			floatRegisters[registerIndex] = Load< double, atAddress >();
 			break;
 		default:
 			throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
@@ -90,9 +96,9 @@ namespace Yal
 		return static_cast< size_t >( address );
 	}
 
-	template< typename scalar_type, bool immediate > void VM::Store( int64_t value )
+	template< typename scalar_type, bool atAddress > void VM::Store( int64_t value )
 	{
-		if ( immediate )
+		if ( atAddress )
 		{
 			memcpy( &data[GetAddress()], &value, sizeof( scalar_type ) );
 		}
@@ -107,7 +113,7 @@ namespace Yal
 		}
 	}
 
-	template< bool immediate >
+	template< bool atAddress >
 	void VM::RegisterStore()
 	{
 		RegisterType registerType = static_cast< RegisterType >( byteCode[ip++] );
@@ -116,34 +122,34 @@ namespace Yal
 		switch ( registerType )
 		{
 		case REGISTER_TYPE_BYTE:
-			Store< int8_t, immediate >( registers[registerIndex] );
+			Store< int8_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_UNSIGNED_BYTE:
-			Store< uint8_t, immediate >( registers[registerIndex] );
+			Store< uint8_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_WORD:
-			Store< int16_t, immediate >( registers[registerIndex] );
+			Store< int16_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_UNSIGNED_WORD:
-			Store< uint16_t, immediate >( registers[registerIndex] );
+			Store< uint16_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_DWORD:
-			Store< int32_t, immediate >( registers[registerIndex] );
+			Store< int32_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_UNSIGNED_DWORD:
-			Store< uint32_t, immediate >( registers[registerIndex] );
+			Store< uint32_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_NATIVE:
-			Store< int64_t, immediate >( registers[registerIndex] );
+			Store< int64_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_UNSIGNED_NATIVE:
-			Store< uint64_t, immediate >( registers[registerIndex] );
+			Store< uint64_t, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_FLOAT:
-			Store< float, immediate >( registers[registerIndex] );
+			Store< float, atAddress >( registers[registerIndex] );
 			break;
 		case REGISTER_TYPE_DOUBLE:
-			Store< double, immediate >( registers[registerIndex] );
+			Store< double, atAddress >( registers[registerIndex] );
 			break;
 		default:
 			throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
@@ -251,6 +257,32 @@ namespace Yal
 			ip = address;
 	}
 
+	void VM::HandleCall()
+	{
+		size_t address = GetAddress();
+		stack.emplace_back( ip );
+		ip = address;
+	}
+
+	void VM::HandleCallIndirect()
+	{
+		size_t address = static_cast< size_t >( RegisterToALU( 0 ) );
+		stack.emplace_back( ip + 2 );
+		ip = address;
+	}
+
+	void VM::HandleCallNative()
+	{
+		NativeFunctionPointer nativeFunction;
+
+		size_t address = GetAddress();
+		stack.emplace_back( ip );
+
+		memcpy( &nativeFunction, &data[address], sizeof( nativeFunction ) );
+
+		nativeFunction( *this );
+	}
+
 	void VM::Run()
 	{
 		ip = 0;
@@ -261,14 +293,18 @@ namespace Yal
 			switch ( instruction )
 			{
 			case InstructionCode::INSTR_CODE_LOAD_IMMEDIATE:
+			case InstructionCode::INSTR_CODE_LOAD_CODE_ADDRESS:
 			case InstructionCode::INSTR_CODE_FLOAT_LOAD_IMMEDIATE:
 			case InstructionCode::INSTR_CODE_DOUBLE_LOAD_IMMEDIATE:
-				RegisterLoad();
+				RegisterLoad< false >();
+				break;
+			case InstructionCode::INSTR_CODE_LOAD_ADDRESS:
+				RegisterLoad< true >();
 				break;
 			case InstructionCode::INSTR_CODE_STORE:
 				RegisterStore< false >();
 				break;
-			case InstructionCode::INSTR_CODE_STORE_IMMEDIATE:
+			case InstructionCode::INSTR_CODE_STORE_ADDRESS:
 				RegisterStore< true >();
 				break;
 			case InstructionCode::INSTR_CODE_MOVE:
@@ -457,9 +493,31 @@ namespace Yal
 				compareResult = FloatRegisterToALU( 0 ) <= FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
+			case InstructionCode::INSTR_CODE_CALL:
+				HandleCall();
+				break;;
+			case InstructionCode::INSTR_CODE_CALL_INDIRECT:
+				HandleCallIndirect();
+				break;;
+			case InstructionCode::INSTR_CODE_CALL_NATIVE:
+				HandleCallNative();
+				break;;
+			case InstructionCode::INSTR_CODE_RETURN:
+				if ( stack.empty() )
+					return;
+				ip = stack.back();
+				stack.pop_back();
 			default:
 				break;
 			}
 		}
+	}
+
+	void VM::SetData( const std::string& name, int64_t value )
+	{
+		auto it = variables.find( name );
+		if ( it == variables.cend() )
+			throw std::exception( "Yal::VM::SetData - Invalid varaible name specified" );
+		memcpy( &data[static_cast< size_t >( it->second )], &value, sizeof( value ) );
 	}
 }
