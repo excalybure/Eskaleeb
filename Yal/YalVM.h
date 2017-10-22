@@ -36,6 +36,7 @@ namespace Yal
 		template< bool immediate > void RegisterStore();
 		int64_t RegisterToALU( size_t ipOffset );
 		void ALUToRegister( size_t ipOffset, int64_t value );
+		double FloatRegisterToALU( size_t ipOffset );
 		template< typename scalar_type, bool immediate > void Store( int64_t value );
 		size_t GetAddress();
 		void HandleJumpIfTrue();

@@ -177,6 +177,21 @@ namespace Yal
 		}
 	}
 
+	double VM::FloatRegisterToALU( size_t ipOffset )
+	{
+		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
+		uint8_t registerIndex = byteCode[ip + ipOffset + 1];
+		switch ( registerType )
+		{
+		case REGISTER_TYPE_FLOAT:
+			return static_cast< float >( floatRegisters[registerIndex] );
+		case REGISTER_TYPE_DOUBLE:
+			return floatRegisters[registerIndex];
+		default:
+			throw std::exception( "INTERNAL ERROR: Invalid foating point register type in code segment" );
+		}
+	}
+
 	void VM::ALUToRegister( size_t ipOffset, int64_t value )
 	{
 		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
@@ -258,6 +273,34 @@ namespace Yal
 			case InstructionCode::INSTR_CODE_COMPLEMENT:
 				ALUToRegister( 0, ~RegisterToALU( 2 ) );
 				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_INCREMENT:
+				ALUToRegister( 0, RegisterToALU( 0 ) + 1 );
+				ip += 2;
+				break;
+			case InstructionCode::INSTR_CODE_ABSOLUTE:
+				ALUToRegister( 0, abs( RegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_NEGATE:
+				ALUToRegister( 0, -RegisterToALU( 2 ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_DECREMENT:
+				ALUToRegister( 0, RegisterToALU( 0 ) - 1 );
+				ip += 2;
+				break;
+			case InstructionCode::INSTR_CODE_CAST_TO_INTEGER:
+				ALUToRegister( 0, static_cast< int64_t >( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_SHIFT_LEFT:
+				ALUToRegister( 0, RegisterToALU( 2 ) << RegisterToALU( 4 ) );
+				ip += 6;
+				break;
+			case InstructionCode::INSTR_CODE_SHIFT_RIGHT:
+				ALUToRegister( 0, RegisterToALU( 2 ) >> RegisterToALU( 4 ) );
+				ip += 6;
 				break;
 			case InstructionCode::INSTR_CODE_ADD:
 				ALUToRegister( 0, RegisterToALU( 2 ) + RegisterToALU( 4 ) );
