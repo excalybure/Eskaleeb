@@ -394,13 +394,19 @@ namespace Yal
 			AppendScalar< scalar_type >( token, buffer );
 		}
 
-		static void AppendAddress( Context &context, const std::string &variableName, Context::NameToAddressMap &nameToAdressMap )
+		static void AppendAddress( Context &context, const std::string &variableName )
 		{
-			if ( nameToAdressMap.find( variableName ) == nameToAdressMap.cend() )
+			if ( context.variables.find( variableName ) == context.variables.cend() )
 				throw std::exception( "Trying to reference an unknown variable" );
 
-			int address = nameToAdressMap[variableName];
+			int address = context.variables[variableName];
 			AppendScalar< int32_t >( address, context.byteCode );
+		}
+
+		static void HandleCodeLabel( Context &context, const std::string &labelName )
+		{
+			context.deferredLabelResolutions.emplace_back( labelName, context.byteCode.size() );
+			AppendScalar< int32_t >( 0, context.byteCode );
 		}
 
 		static void ExpectToken( std::string::const_iterator &it, const std::string::const_iterator &end, const char *expectedToken )
@@ -664,9 +670,9 @@ namespace Yal
 							break;
 						case ARG_TYPE_ADDRESS:
 							if ( WantsCodeAddress( code ) )
-								AppendAddress( context, token, context.labels );
+								HandleCodeLabel( context, token );
 							else
-								AppendAddress( context, token, context.variables );
+								AppendAddress( context, token );
 							break;
 						}
 					}
@@ -712,6 +718,16 @@ namespace Yal
 						throw std::exception( "Unrecognized instruction" );
 					}
 				}
+			}
+
+			for ( const auto &label : context.deferredLabelResolutions )
+			{
+				const auto labelIt = context.labels.find( std::get< 0 >( label ) );
+				if ( labelIt == context.labels.cend() )
+					throw std::exception( "Trying to reference an unknown variable" );
+
+				int address = labelIt->second;
+				memcpy( &context.byteCode[std::get< 1 >( label )], &address, sizeof( address ) );
 			}
 
 			context.byteCode.shrink_to_fit();
@@ -794,6 +810,17 @@ namespace Yal
 				text += std::to_string( registerIndex );
 			};
 
+			auto appendLabel = [&addressToLabelNameMap] ( const Context &context, std::string &text, std::vector< uint8_t >::const_iterator &codeIt )
+			{
+				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), codeIt ) ) );
+				if ( labelIt != addressToLabelNameMap.cend() )
+				{
+					text += ":";
+					text += labelIt->second;
+					text += "\n";
+				}
+			};
+
 			text.clear();
 			text.reserve( 1 * MB );
 
@@ -807,13 +834,7 @@ namespace Yal
 			{
 				RegisterType registerType = REGISTER_TYPE_DWORD;
 
-				auto labelIt = addressToLabelNameMap.find( static_cast< int >( std::distance( context.byteCode.cbegin(), it ) ) );
-				if ( labelIt != addressToLabelNameMap.cend() )
-				{
-					text += ":";
-					text += labelIt->second;
-					text += "\n";
-				}
+				appendLabel( context, text, it );
 
 				InstructionCode code = static_cast< InstructionCode >( *it );
 				++it;
@@ -885,6 +906,8 @@ namespace Yal
 
 				text += '\n';
 			}
+
+			appendLabel( context, text, it );
 
 			text.shrink_to_fit();
 		}

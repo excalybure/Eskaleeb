@@ -334,10 +334,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 2
-					compeq r0, r1
-					jumpt equal
+					cmpeq r0, r1
+					jmpt equal
 					ldi r0, 0
-					jump end
+					jmp end
 				:equal
 					ldi r0, 1
 				:end)";
@@ -355,10 +355,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 3
-					compeq r0, r1
-					jumpt equal
+					cmpeq r0, r1
+					jmpt equal
 					ldi r0, 0
-					jump end
+					jmp end
 				:equal
 					ldi r0, 1
 				:end)";
@@ -376,10 +376,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 3
 					ldi r1, 2
-					compgt r0, r1
-					jumpt correct
+					cmpgt r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -397,10 +397,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 3
-					compgt r0, r1
-					jumpt correct
+					cmpgt r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -418,10 +418,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 2
-					compge r0, r1
-					jumpt correct
+					cmpge r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -439,10 +439,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 3
-					compge r0, r1
-					jumpt correct
+					cmpge r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -460,10 +460,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 3
-					complt r0, r1
-					jumpt correct
+					cmplt r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -481,10 +481,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 3
 					ldi r1, 2
-					complt r0, r1
-					jumpt correct
+					cmplt r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -502,10 +502,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 2
 					ldi r1, 2
-					comple r0, r1
-					jumpt correct
+					cmple r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";
@@ -523,10 +523,10 @@ namespace UnitTests
 			context.source = R"(
 					ldi r0, 3
 					ldi r1, 2
-					complt r0, r1
-					jumpt correct
+					cmple r0, r1
+					jmpt correct
 					ldi r0, 0
-					jump end
+					jmp end
 				:correct
 					ldi r0, 1
 				:end)";

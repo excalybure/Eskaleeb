@@ -422,6 +422,16 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == ":foo\njmpt foo\n" );
 		}
 
+		TEST_METHOD( TestJumpWithLabelDefinedLater )
+		{
+			context.source = "jmp foo\n:foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "jmp foo\n:foo\n" );
+		}
+
 		TEST_METHOD( TestExceptionIsThrownOnUnrecognizedInstruction )
 		{
 			context.source = "foo bar";

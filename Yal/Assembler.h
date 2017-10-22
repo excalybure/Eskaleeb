@@ -118,12 +118,14 @@ namespace Yal
 		{
 			using NameToAddressMap = std::unordered_map< std::string, int >;
 			using AddressToNameMap = std::unordered_map< int, std::string >;
+			using LabelCall = std::tuple< std::string, size_t >;
 
 			std::string				source;
 			std::vector< uint8_t >	byteCode;
 			std::vector< uint8_t >	data;
 			NameToAddressMap		variables;
 			NameToAddressMap		labels;
+			std::vector< LabelCall > deferredLabelResolutions;
 		};
 
 		void Assemble( Context &context );

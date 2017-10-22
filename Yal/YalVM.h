@@ -29,11 +29,15 @@ namespace Yal
 		std::vector< int64_t >	registers;
 		std::vector< double >	floatRegisters;
 		size_t					ip;
+		bool					compareResult;
+		uint8_t					padding[7];
 
 		void RegisterLoad();
 		template< bool immediate > void RegisterStore();
 		int64_t RegisterToALU( size_t ipOffset );
 		void ALUToRegister( size_t ipOffset, int64_t value );
 		template< typename scalar_type, bool immediate > void Store( int64_t value );
+		size_t GetAddress();
+		void HandleJumpIfTrue();
 	};
 }

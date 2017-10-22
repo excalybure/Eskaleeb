@@ -80,16 +80,21 @@ namespace Yal
 		}
 	};
 
+	size_t VM::GetAddress()
+	{
+		int address;
+
+		memcpy( &address, &byteCode[ip], sizeof( address ) );
+		ip += sizeof( address );
+
+		return static_cast< size_t >( address );
+	}
+
 	template< typename scalar_type, bool immediate > void VM::Store( int64_t value )
 	{
 		if ( immediate )
 		{
-			int address;
-
-			memcpy( &address, &byteCode[ip], sizeof( address ) );
-			ip += sizeof( address );
-
-			memcpy( &data[static_cast< size_t>( address )], &value, sizeof( scalar_type ) );
+			memcpy( &data[GetAddress()], &value, sizeof( scalar_type ) );
 		}
 		else
 		{
@@ -207,9 +212,17 @@ namespace Yal
 		}
 	}
 
+	void VM::HandleJumpIfTrue()
+	{
+		size_t address = GetAddress();
+		if ( compareResult )
+			ip = address;
+	}
+
 	void VM::Run()
 	{
 		ip = 0;
+		compareResult = false;
 		while ( ip != byteCode.size() )
 		{
 			InstructionCode instruction = static_cast< InstructionCode >( byteCode[ip++] );
@@ -277,6 +290,32 @@ namespace Yal
 			case InstructionCode::INSTR_CODE_LOGICAL_NOT:
 				ALUToRegister( 0, !RegisterToALU( 2 ) );
 				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_COMPARE_EQUAL:
+				compareResult = RegisterToALU( 0 ) == RegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_COMPARE_GREATER_THAN:
+				compareResult = RegisterToALU( 0 ) > RegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_COMPARE_GREATER_EQUAL:
+				compareResult = RegisterToALU( 0 ) >= RegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_COMPARE_LESS_THAN:
+				compareResult = RegisterToALU( 0 ) < RegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_COMPARE_LESS_EQUAL:
+				compareResult = RegisterToALU( 0 ) <= RegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_JUMP:
+				ip = GetAddress();
+				break;
+			case InstructionCode::INSTR_CODE_JUMP_IF_TRUE:
+				HandleJumpIfTrue();
 				break;
 			default:
 				break;
