@@ -34,7 +34,7 @@ namespace Yal
 		std::vector< uint8_t >	data;
 		NameToAddressMap		variables;
 		std::vector< int64_t >	registers;
-		std::vector< size_t >	stack;
+		std::vector< int64_t >	stack;
 		std::vector< double >	floatRegisters;
 		size_t					ip;
 		bool					compareResult;

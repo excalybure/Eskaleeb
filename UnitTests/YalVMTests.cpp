@@ -1388,6 +1388,22 @@ namespace UnitTests
 
 			Assert::IsTrue( nativeFunctionCalled );
 		}
+
+		TEST_METHOD( TestPushAndPop )
+		{
+			context.source = R"(
+				ldi r0, 100
+				push r0
+				ldi r0, 50
+				pop r0)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data, context.variables );
+			vm.Run();
+
+			Assert::IsTrue( 100 == vm.GetRegisterValue( 0 ) );
+		}
 	private:
 		Yal::Assembler::Context context;
 		Yal::VM vm;

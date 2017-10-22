@@ -260,7 +260,7 @@ namespace Yal
 	void VM::HandleCall()
 	{
 		size_t address = GetAddress();
-		stack.emplace_back( ip );
+		stack.emplace_back( static_cast< int64_t >( ip ) );
 		ip = address;
 	}
 
@@ -501,12 +501,21 @@ namespace Yal
 				break;;
 			case InstructionCode::INSTR_CODE_CALL_NATIVE:
 				HandleCallNative();
-				break;;
+				break;
 			case InstructionCode::INSTR_CODE_RETURN:
 				if ( stack.empty() )
 					return;
-				ip = stack.back();
+				ip = static_cast< size_t >( stack.back() );
 				stack.pop_back();
+				break;
+			case InstructionCode::INSTR_CODE_PUSH:
+				stack.push_back( RegisterToALU( 0 ) );
+				ip += 2;
+			case InstructionCode::INSTR_CODE_POP:
+				if ( stack.empty() )
+					throw std::exception( "Yal::VM::Run(Pop) - Stack is empty" );
+				ALUToRegister( 0, stack.back() );
+				ip += 2;
 			default:
 				break;
 			}
