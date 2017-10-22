@@ -965,6 +965,347 @@ namespace UnitTests
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
+		TEST_METHOD( TestDoubleAdd )
+		{
+			context.source = "dfldi dfr0, 3\ndfldi dfr1, 4\ndfadd dfr2, dfr0, dfr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 7 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestDoubleSub )
+		{
+			context.source = "dfldi dfr0, 3\ndfldi dfr1, 4\ndfsub dfr2, dfr0, dfr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( -1 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestDoubleMul )
+		{
+			context.source = "dfldi dfr0, 3\ndfldi dfr1, 4\ndfmul dfr2, dfr0, dfr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 12 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestDoubleDiv )
+		{
+			context.source = "dfldi dfr0, 12\ndfldi dfr1, 4\ndfdiv dfr2, dfr0, dfr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestDoubleAbs )
+		{
+			context.source = "dfldi dfr0, -3\ndfabs dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleNeg )
+		{
+			context.source = "dfldi dfr0, 3\ndfneg dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( -3 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleCos )
+		{
+			context.source = "dfldi dfr0, 3\ndfcos dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( cos( 3 ) == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleSin )
+		{
+			context.source = "dfldi dfr0, 3\ndfsin dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( sin( 3 ) == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleSqrt )
+		{
+			context.source = "dfldi dfr0, 25\ndfsqrt dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 5 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleRound )
+		{
+			context.source = "dfldi dfr0, 3.7\ndfrnd dfr1, dfr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 4 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestDoubleCast )
+		{
+			context.source = "ldi r0, 3\ndfcast dfr0, r0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareEqualWhenTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 2
+					dfcmpeq dfr0, dfr1
+					jmpt equal
+					ldi r0, 0
+					jmp end
+				:equal
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareEqualWhenNotTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 3
+					dfcmpeq dfr0, dfr1
+					jmpt equal
+					ldi r0, 0
+					jmp end
+				:equal
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterThanWhenTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 3
+					dfldi dfr1, 2
+					dfcmpgt dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterThanWhenNotTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 3
+					dfcmpgt dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterEqualWhenTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 2
+					dfcmpge dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareGreaterEqualWhenNotTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 3
+					dfcmpge dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessThanWhenTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 3
+					dfcmplt dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessThanWhenNotTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 3
+					dfldi dfr1, 2
+					dfcmplt dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessEqualWhenTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 2
+					dfldi dfr1, 2
+					dfcmple dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestDoubleCompareLessEqualWhenNotTrue )
+		{
+			context.source = R"(
+					dfldi dfr0, 3
+					dfldi dfr1, 2
+					dfcmple dfr0, dfr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
 	private:
 		Yal::Assembler::Context context;
 		Yal::VM vm;

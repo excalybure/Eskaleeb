@@ -378,66 +378,82 @@ namespace Yal
 				HandleJumpIfTrue();
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_ADD:
+			case InstructionCode::INSTR_CODE_DOUBLE_ADD:
 				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) + FloatRegisterToALU( 4 ) );
 				ip += 6;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_SUBTRACT:
+			case InstructionCode::INSTR_CODE_DOUBLE_SUBTRACT:
 				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) - FloatRegisterToALU( 4 ) );
 				ip += 6;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_MULTIPLY:
+			case InstructionCode::INSTR_CODE_DOUBLE_MULTIPLY:
 				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) * FloatRegisterToALU( 4 ) );
 				ip += 6;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_DIVIDE:
+			case InstructionCode::INSTR_CODE_DOUBLE_DIVIDE:
 				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) / FloatRegisterToALU( 4 ) );
 				ip += 6;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COS:
+			case InstructionCode::INSTR_CODE_DOUBLE_COS:
 				ALUToFloatRegister( 0, cos( FloatRegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_SIN:
+			case InstructionCode::INSTR_CODE_DOUBLE_SIN:
 				ALUToFloatRegister( 0, sin( FloatRegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_SQRT:
+			case InstructionCode::INSTR_CODE_DOUBLE_SQRT:
 				ALUToFloatRegister( 0, sqrt( FloatRegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_ABSOLUTE:
+			case InstructionCode::INSTR_CODE_DOUBLE_ABSOLUTE:
 				ALUToFloatRegister( 0, abs( FloatRegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_NEGATE:
+			case InstructionCode::INSTR_CODE_DOUBLE_NEGATE:
 				ALUToFloatRegister( 0, -FloatRegisterToALU( 2 ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_RND:
+			case InstructionCode::INSTR_CODE_DOUBLE_RND:
 				ALUToFloatRegister( 0, round( FloatRegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_CAST:
+			case InstructionCode::INSTR_CODE_DOUBLE_CAST:
 				ALUToFloatRegister( 0, static_cast< double >( RegisterToALU( 2 ) ) );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_EQUAL:
+			case InstructionCode::INSTR_CODE_DOUBLE_COMPARE_EQUAL:
 				compareResult = FloatRegisterToALU( 0 ) == FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_GREATER_THAN:
+			case InstructionCode::INSTR_CODE_DOUBLE_COMPARE_GREATER_THAN:
 				compareResult = FloatRegisterToALU( 0 ) > FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_GREATER_EQUAL:
+			case InstructionCode::INSTR_CODE_DOUBLE_COMPARE_GREATER_EQUAL:
 				compareResult = FloatRegisterToALU( 0 ) >= FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_LESS_THAN:
+			case InstructionCode::INSTR_CODE_DOUBLE_COMPARE_LESS_THAN:
 				compareResult = FloatRegisterToALU( 0 ) < FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
 			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_LESS_EQUAL:
+			case InstructionCode::INSTR_CODE_DOUBLE_COMPARE_LESS_EQUAL:
 				compareResult = FloatRegisterToALU( 0 ) <= FloatRegisterToALU( 2 );
 				ip += 4;
 				break;
