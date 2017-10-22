@@ -282,6 +282,16 @@ namespace UnitTests
 			Assert::IsTrue( disassembledText == "st r10, r11\n" );
 		}
 
+		TEST_METHOD( TestStoreImmediate )
+		{
+			context.source = "int64 foo;\nsti r10, foo";
+
+			Yal::Assembler::Assemble( context );
+			Yal::Assembler::Disassemble( context, disassembledText );
+
+			Assert::IsTrue( disassembledText == "sti r10, foo\n" );
+		}
+
 		TEST_METHOD( TestPush )
 		{
 			context.source = "push r10";

@@ -30,7 +30,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( -10000000 == static_cast< int64_t >( vm.getRegisterValue( 0 ) ) );
+			Assert::IsTrue( -10000000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
 		}
 	
 		TEST_METHOD( TestLoadByteImmediate )
@@ -42,7 +42,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( -100 == static_cast< int64_t >( vm.getRegisterValue( 0 ) ) );
+			Assert::IsTrue( -100 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
 		}
 
 		TEST_METHOD( TestLoadWordImmediate )
@@ -54,7 +54,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( -1000 == static_cast< int64_t >( vm.getRegisterValue( 0 ) ) );
+			Assert::IsTrue( -1000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
 		}
 
 		TEST_METHOD( TestLoadDWordImmediate )
@@ -66,7 +66,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( -100000 == static_cast< int64_t >( vm.getRegisterValue( 0 ) ) );
+			Assert::IsTrue( -100000 == static_cast< int64_t >( vm.GetRegisterValue( 0 ) ) );
 		}
 
 		TEST_METHOD( TestLoadUnsignedNativeImmediate )
@@ -78,7 +78,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 10000000 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 10000000 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestLoadUnsignedByteImmediate )
@@ -90,7 +90,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 100 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestLoadUnsignedWordImmediate )
@@ -102,7 +102,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1000 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1000 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestLoadUnsignedDWordImmediate )
@@ -114,7 +114,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100000 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 100000 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestFloatLoadImmediate )
@@ -126,7 +126,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100000 == vm.getFloatRegisterValue( 0 ) );
+			Assert::IsTrue( 100000 == vm.GetFloatRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestDoubleLoadImmediate )
@@ -138,7 +138,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100000 == vm.getFloatRegisterValue( 0 ) );
+			Assert::IsTrue( 100000 == vm.GetFloatRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestMove )
@@ -150,19 +150,31 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100000 == vm.getFloatRegisterValue( 1 ) );
+			Assert::IsTrue( 100000 == vm.GetRegisterValue( 1 ) );
 		}
 
 		TEST_METHOD( TestStore )
 		{
-			context.source = "int64 foo; ldi r0, 100000\st r0, foo";
+			context.source = "int64 foo; lea r1, foo\nldi r0, 100000\nst r0, r1";
 
 			Yal::Assembler::Assemble( context );
 
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 100000 == *static_cast< int64_t *>( &vm.getData()[0] ) );
+			Assert::IsTrue( 100000 == *reinterpret_cast< const int64_t * >( &vm.GetData()[0] ) );
+		}
+
+		TEST_METHOD( TestStoreImmediate )
+		{
+			context.source = "int64 foo; ldi r0, 100000\nsti r0, foo";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 100000 == *reinterpret_cast< const int64_t * >( &vm.GetData()[0] ) );
 		}
 
 		TEST_METHOD( TestIntegerAdd )
@@ -174,7 +186,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 7 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 7 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerSubtract )
@@ -186,7 +198,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 2 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 2 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerMultiply )
@@ -198,7 +210,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 12 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 12 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerDivide )
@@ -210,7 +222,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 3 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 3 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestAnd )
@@ -222,7 +234,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 2 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 2 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerOr )
@@ -234,7 +246,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 3 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 3 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerXor )
@@ -246,19 +258,21 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestIntegerComplement )
 		{
-			context.source = "ldi r0, 127\ncompl rb1, rb0";
+			context.source = "ldi r0, 127\ncompl rb1, rb0\nldi r0, 0\ncompl rb2, rb0\nldi r0, 1\ncompl rb3, rb0\n";
 
 			Yal::Assembler::Assemble( context );
 
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 128 == vm.getRegisterValue( 1 ) );
+			Assert::IsTrue( -128 == vm.GetRegisterValue( 1 ) );
+			Assert::IsTrue( -1 == vm.GetRegisterValue( 2 ) );
+			Assert::IsTrue( -2 == vm.GetRegisterValue( 3 ) );
 		}
 
 		TEST_METHOD( TestLogicalAnd )
@@ -270,8 +284,8 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 2 ) );
-			Assert::IsTrue( 0 == vm.getRegisterValue( 3 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 3 ) );
 		}
 
 		TEST_METHOD( TestLogicalOr )
@@ -283,9 +297,9 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 2 ) );
-			Assert::IsTrue( 1 == vm.getRegisterValue( 3 ) );
-			Assert::IsTrue( 0 == vm.getRegisterValue( 4 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 3 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 4 ) );
 		}
 
 		TEST_METHOD( TestLogicalXor )
@@ -297,9 +311,9 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 2 ) );
-			Assert::IsTrue( 1 == vm.getRegisterValue( 3 ) );
-			Assert::IsTrue( 1 == vm.getRegisterValue( 4 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 2 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 3 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 4 ) );
 		}
 
 		TEST_METHOD( TestLogicalNot )
@@ -311,8 +325,8 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 1 ) );
-			Assert::IsTrue( 1 == vm.getRegisterValue( 2 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 1 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 2 ) );
 		}
 
 		TEST_METHOD( TestCompareEqualWhenTrue )
@@ -333,7 +347,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareEqualWhenNotTrue )
@@ -354,7 +368,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareGreaterThanWhenTrue )
@@ -375,7 +389,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareGreaterThanWhenNotTrue )
@@ -396,7 +410,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareGreaterEqualWhenTrue )
@@ -417,7 +431,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareGreaterEqualWhenNotTrue )
@@ -438,7 +452,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareLessThanWhenTrue )
@@ -459,7 +473,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareLessThanWhenNotTrue )
@@ -480,7 +494,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareLessEqualWhenTrue )
@@ -501,7 +515,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 1 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
 		}
 
 		TEST_METHOD( TestCompareLessEqualWhenNotTrue )
@@ -522,7 +536,7 @@ namespace UnitTests
 			vm.Init( 10, 10, context.byteCode, context.data );
 			vm.Run();
 
-			Assert::IsTrue( 0 == vm.getRegisterValue( 0 ) );
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
 	private:

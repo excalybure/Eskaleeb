@@ -19,17 +19,21 @@ namespace Yal
 
 		void Run();
 
-		uint64_t getRegisterValue( size_t index ) const { return registers[index]; }
-		double getFloatRegisterValue( size_t index ) const { return floatRegisters[index]; }
-		const std::vector< uint8_t > &getData() const { return data; }
+		int64_t GetRegisterValue( size_t index ) const { return registers[index]; }
+		double GetFloatRegisterValue( size_t index ) const { return floatRegisters[index]; }
+		const std::vector< uint8_t > &GetData() const { return data; }
 
 	private:
 		std::vector< uint8_t >	byteCode;
 		std::vector< uint8_t >	data;
-		std::vector< uint64_t >	registers;
+		std::vector< int64_t >	registers;
 		std::vector< double >	floatRegisters;
 		size_t					ip;
 
 		void RegisterLoad();
+		template< bool immediate > void RegisterStore();
+		int64_t RegisterToALU( size_t ipOffset );
+		void ALUToRegister( size_t ipOffset, int64_t value );
+		template< typename scalar_type, bool immediate > void Store( int64_t value );
 	};
 }

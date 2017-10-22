@@ -73,6 +73,12 @@ namespace UnitTests
 			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_STORE == Yal::Lexer::TokenToTokenId( token ) );
 		}
 
+		TEST_METHOD( TestStoreImmediate )
+		{
+			std::string token( "sti" );
+			Assert::IsTrue( Yal::Lexer::TokenId::TOKEN_STORE_IMMEDIATE == Yal::Lexer::TokenToTokenId( token ) );
+		}
+
 		TEST_METHOD( TestFloatLoadImmediate )
 		{
 			std::string token( "fldi" );

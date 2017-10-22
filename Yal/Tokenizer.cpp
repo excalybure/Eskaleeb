@@ -19,6 +19,7 @@ namespace Yal
 			s_tokenToTokenIdMap["dfldi"] = TokenId::TOKEN_DOUBLE_LOAD_IMMEDIATE;
 			s_tokenToTokenIdMap["ld"] = TokenId::TOKEN_LOAD;
 			s_tokenToTokenIdMap["st"] = TokenId::TOKEN_STORE;
+			s_tokenToTokenIdMap["sti"] = TokenId::TOKEN_STORE_IMMEDIATE;
 			s_tokenToTokenIdMap["push"] = TokenId::TOKEN_PUSH;
 			s_tokenToTokenIdMap["pop"] = TokenId::TOKEN_POP;
 
