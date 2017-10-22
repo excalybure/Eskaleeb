@@ -623,6 +623,348 @@ namespace UnitTests
 			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
 		}
 
+		TEST_METHOD( TestFloatAdd )
+		{
+			context.source = "fldi fr0, 3\nfldi fr1, 4\nfadd fr2, fr0, fr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 7 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestFloatSub )
+		{
+			context.source = "fldi fr0, 3\nfldi fr1, 4\nfsub fr2, fr0, fr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( -1 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestFloatMul )
+		{
+			context.source = "fldi fr0, 3\nfldi fr1, 4\nfmul fr2, fr0, fr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 12 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestFloatDiv )
+		{
+			context.source = "fldi fr0, 12\nfldi fr1, 4\nfdiv fr2, fr0, fr1";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 2 ) );
+		}
+
+		TEST_METHOD( TestFloatAbs )
+		{
+			context.source = "fldi fr0, -3\nfabs fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatNeg )
+		{
+			context.source = "fldi fr0, 3\nfneg fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( -3 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatCos )
+		{
+			context.source = "fldi fr0, 3\nfcos fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( static_cast< float >( cos( 3 ) ) == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatSin )
+		{
+			context.source = "fldi fr0, 3\nfsin fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( static_cast< float >( sin( 3 ) ) == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatSqrt )
+		{
+			context.source = "fldi fr0, 25\nfsqrt fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 5 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatRound )
+		{
+			context.source = "fldi fr0, 3.7\nfrnd fr1, fr0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 4 == vm.GetFloatRegisterValue( 1 ) );
+		}
+
+		TEST_METHOD( TestFloatCast )
+		{
+			context.source = "ldi r0, 3\nfcast fr0, r0";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 3 == vm.GetFloatRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareEqualWhenTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 2
+					fcmpeq fr0, fr1
+					jmpt equal
+					ldi r0, 0
+					jmp end
+				:equal
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareEqualWhenNotTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 3
+					fcmpeq fr0, fr1
+					jmpt equal
+					ldi r0, 0
+					jmp end
+				:equal
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterThanWhenTrue )
+		{
+			context.source = R"(
+					fldi fr0, 3
+					fldi fr1, 2
+					fcmpgt fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterThanWhenNotTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 3
+					fcmpgt fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterEqualWhenTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 2
+					fcmpge fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareGreaterEqualWhenNotTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 3
+					fcmpge fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareLessThanWhenTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 3
+					fcmplt fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareLessThanWhenNotTrue )
+		{
+			context.source = R"(
+					fldi fr0, 3
+					fldi fr1, 2
+					fcmplt fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareLessEqualWhenTrue )
+		{
+			context.source = R"(
+					fldi fr0, 2
+					fldi fr1, 2
+					fcmple fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 1 == vm.GetRegisterValue( 0 ) );
+		}
+
+		TEST_METHOD( TestFloatCompareLessEqualWhenNotTrue )
+		{
+			context.source = R"(
+					fldi fr0, 3
+					fldi fr1, 2
+					fcmple fr0, fr1
+					jmpt correct
+					ldi r0, 0
+					jmp end
+				:correct
+					ldi r0, 1
+				:end)";
+
+			Yal::Assembler::Assemble( context );
+
+			vm.Init( 10, 10, context.byteCode, context.data );
+			vm.Run();
+
+			Assert::IsTrue( 0 == vm.GetRegisterValue( 0 ) );
+		}
+
 	private:
 		Yal::Assembler::Context context;
 		Yal::VM vm;

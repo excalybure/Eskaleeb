@@ -32,13 +32,15 @@ namespace Yal
 		bool					compareResult;
 		uint8_t					padding[7];
 
-		void RegisterLoad();
-		template< bool immediate > void RegisterStore();
+		template< bool immediate >							void RegisterStore();
+		template< typename scalar_type, bool immediate >	void Store( int64_t value );
+
+		void	RegisterLoad();
 		int64_t RegisterToALU( size_t ipOffset );
-		void ALUToRegister( size_t ipOffset, int64_t value );
-		double FloatRegisterToALU( size_t ipOffset );
-		template< typename scalar_type, bool immediate > void Store( int64_t value );
-		size_t GetAddress();
-		void HandleJumpIfTrue();
+		void	ALUToRegister( size_t ipOffset, int64_t value );
+		double	FloatRegisterToALU( size_t ipOffset );
+		void	ALUToFloatRegister( size_t ipOffset, double value );
+		size_t	GetAddress();
+		void	HandleJumpIfTrue();
 	};
 }

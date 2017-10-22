@@ -62,7 +62,11 @@ fcmplt frA, frB			-> compare less than
 fcmple frA, frB			-> compare less equal
 fcmpgt frA, frB			-> compare greater than
 fcmpge frA, frB			-> compare greater equal
- 
+
+fadd frA, frB, frC		-> frA = frB + frC
+fsub frA, frB, frC		-> frA = frB - frC
+fmul frA, frB, frC		-> frA = frB * frC
+fdiv frA, frB, frC		-> frA = frB / frC
 fsqrt frA, frB			-> frA = sqrt(frB)
 fabs frA, frB			-> frA = abs(frB)
 fneg frA, frB			-> frA = -frB

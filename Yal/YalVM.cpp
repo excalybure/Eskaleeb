@@ -177,21 +177,6 @@ namespace Yal
 		}
 	}
 
-	double VM::FloatRegisterToALU( size_t ipOffset )
-	{
-		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
-		uint8_t registerIndex = byteCode[ip + ipOffset + 1];
-		switch ( registerType )
-		{
-		case REGISTER_TYPE_FLOAT:
-			return static_cast< float >( floatRegisters[registerIndex] );
-		case REGISTER_TYPE_DOUBLE:
-			return floatRegisters[registerIndex];
-		default:
-			throw std::exception( "INTERNAL ERROR: Invalid foating point register type in code segment" );
-		}
-	}
-
 	void VM::ALUToRegister( size_t ipOffset, int64_t value )
 	{
 		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
@@ -224,6 +209,38 @@ namespace Yal
 			break;
 		default:
 			throw std::exception( "INTERNAL ERROR: Invalid register type in code segment" );
+		}
+	}
+
+	double VM::FloatRegisterToALU( size_t ipOffset )
+	{
+		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
+		uint8_t registerIndex = byteCode[ip + ipOffset + 1];
+		switch ( registerType )
+		{
+		case REGISTER_TYPE_FLOAT:
+			return static_cast< float >( floatRegisters[registerIndex] );
+		case REGISTER_TYPE_DOUBLE:
+			return floatRegisters[registerIndex];
+		default:
+			throw std::exception( "INTERNAL ERROR: Invalid foating point register type in code segment" );
+		}
+	}
+
+	void VM::ALUToFloatRegister( size_t ipOffset, double value )
+	{
+		RegisterType registerType = static_cast< RegisterType >( byteCode[ip + ipOffset] );
+		uint8_t registerIndex = byteCode[ip + ipOffset + 1];
+		switch ( registerType )
+		{
+		case REGISTER_TYPE_FLOAT:
+			floatRegisters[registerIndex] = static_cast< float >( value );
+			break;
+		case REGISTER_TYPE_DOUBLE:
+			floatRegisters[registerIndex] = value;
+			break;
+		default:
+			throw std::exception( "INTERNAL ERROR: Invalid foating point register type in code segment" );
 		}
 	}
 
@@ -359,6 +376,70 @@ namespace Yal
 				break;
 			case InstructionCode::INSTR_CODE_JUMP_IF_TRUE:
 				HandleJumpIfTrue();
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_ADD:
+				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) + FloatRegisterToALU( 4 ) );
+				ip += 6;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_SUBTRACT:
+				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) - FloatRegisterToALU( 4 ) );
+				ip += 6;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_MULTIPLY:
+				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) * FloatRegisterToALU( 4 ) );
+				ip += 6;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_DIVIDE:
+				ALUToFloatRegister( 0, FloatRegisterToALU( 2 ) / FloatRegisterToALU( 4 ) );
+				ip += 6;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COS:
+				ALUToFloatRegister( 0, cos( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_SIN:
+				ALUToFloatRegister( 0, sin( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_SQRT:
+				ALUToFloatRegister( 0, sqrt( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_ABSOLUTE:
+				ALUToFloatRegister( 0, abs( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_NEGATE:
+				ALUToFloatRegister( 0, -FloatRegisterToALU( 2 ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_RND:
+				ALUToFloatRegister( 0, round( FloatRegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_CAST:
+				ALUToFloatRegister( 0, static_cast< double >( RegisterToALU( 2 ) ) );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_EQUAL:
+				compareResult = FloatRegisterToALU( 0 ) == FloatRegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_GREATER_THAN:
+				compareResult = FloatRegisterToALU( 0 ) > FloatRegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_GREATER_EQUAL:
+				compareResult = FloatRegisterToALU( 0 ) >= FloatRegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_LESS_THAN:
+				compareResult = FloatRegisterToALU( 0 ) < FloatRegisterToALU( 2 );
+				ip += 4;
+				break;
+			case InstructionCode::INSTR_CODE_FLOAT_COMPARE_LESS_EQUAL:
+				compareResult = FloatRegisterToALU( 0 ) <= FloatRegisterToALU( 2 );
+				ip += 4;
 				break;
 			default:
 				break;
