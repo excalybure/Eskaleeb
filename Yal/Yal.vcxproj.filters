@@ -59,5 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="byte_code_grammar.txt" />
+    <Text Include="yal_grammar.txt" />
   </ItemGroup>
 </Project>
