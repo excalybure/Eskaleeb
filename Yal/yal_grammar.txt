@@ -1,68 +1,68 @@
 Yal feature sets
-C/C++ style syntax
-Object oriented
-Interface
-Classes
-virtual
-override
-final
-Delegates
-Lambda functions
-Templates
-Reflection
-Edit & continue
-Change existing functions
-New functions
-Delete functions
-New classes
-Delete classes
-Change function signatures
-Add/Remove class fields
-Parallelism
-Tasks
-parallel loops
-Semaphores/mutexes
-Safe ownership
-Only one owner (same idea as rust)
-Atomatic deletion when owner goes away
-Contract programming
-Specify valid input
-Specify expected outputs
-Exceptions
-Namespaces
-
+	C/C++ style syntax
+	Object oriented
+	Interface
+	Classes
+	virtual
+	override
+	final
+	Delegates
+	Lambda functions
+	Templates
+	Reflection
+	Edit & continue
+	Change existing functions
+	New functions
+	Delete functions
+	New classes
+	Delete classes
+	Change function signatures
+	Add/Remove class fields
+	Parallelism
+	Tasks
+	parallel loops
+	Semaphores/mutexes
+	Safe ownership
+	Only one owner (same idea as rust)
+	Atomatic deletion when owner goes away
+	Contract programming
+	Specify valid input
+	Specify expected outputs
+	Exceptions
+	Namespaces
+	
 Yal grammar:
 
-imports*
-[namespace|definitions]
-definitions = [class|interface|function]*
-class = 'class' class_name [':' 'public'? class_name]? '{' class_component* '}' 
-interface = 'interface' class_name '{' interface_methods* '}' 
-class_component = class_field|class_method
-class_field = type_name field_field_name array_modifier? ['=' initializer]? ';'
-type_name = scalar_type|class_name|'string'
-scalar_type = 'int8'|'int16'|'int23'|'int64'|'uint8'|'uint16'|'uint23'|'uint64'|'float'|'double'
-class_name = literal
-array_modifier='['integer_value']'
-integer_value=0..9+
-initializer=expression
-class_method=['virtual'|'override']? function_signature function_body
-function_signature = return_type function_name '(' function_argument [',' function_argument]* ')'
-function_body = '{' statement* '}'
-interface_method =  function_signature ';'
-statement = assignment_statement|if_statement|switch_statement|for_statement|while_statement|expression_statement|block_statement|return_statement
-assignment_statement = variable_name [array_reference|] '=' expression_statement
-expression_statement = expression ';'
-if_expression = 'if' '(' boolean_expression ')' statement [else_statement|]
-boolean_expression = expression
-else_statement = 'else' statement
-for_statement = 'for' '(' [assignment_statement|] ';' boolean_expression ';' [assignment_statement|] ')' statement
-while_statement = 'while' '(' boolean_expression ')' statement
-block_statement = '{' statement '}'
-return_statement = 'return' expression_statement
-expression = function_call|paren_expression|unary_expression|binary_expression|ternary_expression
-function_call = function_name '(' function_call_arguments? ')'
-function_call_arguments = function_call_argument [',' function_call_argument]*
+	imports*
+	[namespace|definitions]
+	definitions = [class|interface|function]*
+	class = 'class' class_name [':' 'public'? class_name]? '{' class_component* '}' 
+	interface = 'interface' class_name '{' interface_methods* '}' 
+	class_component = class_field|class_method
+	class_field = type_name field_field_name array_modifier? ['=' initializer]? ';'
+	type_name = scalar_type|class_name|'string'
+	scalar_type = 'int8'|'int16'|'int23'|'int64'|'uint8'|'uint16'|'uint23'|'uint64'|'float'|'double'
+	class_name = literal
+	array_modifier='['integer_value']'
+	integer_value=0..9+
+	initializer=expression
+	class_method=['virtual'|'override']? function_signature function_body
+	function_signature = return_type function_name '(' function_argument [',' function_argument]* ')'
+	function_body = '{' statement* '}'
+	interface_method =  function_signature ';'
+	statement = assignment_statement|if_statement|switch_statement|for_statement|while_statement|expression_statement|block_statement|return_statement
+	assignment_statement = variable_name [array_reference|] '=' expression_statement
+	expression_statement = expression ';'
+	if_expression = 'if' '(' boolean_expression ')' statement [else_statement|]
+	boolean_expression = expression
+	else_statement = 'else' statement
+	for_statement = 'for' '(' [assignment_statement|] ';' boolean_expression ';' [assignment_statement|] ')' statement
+	while_statement = 'while' '(' boolean_expression ')' statement
+	block_statement = '{' statement '}'
+	return_statement = 'return' expression_statement
+	expression = function_call|paren_expression|unary_expression|binary_expression|ternary_expression
+	function_call = function_name '(' function_call_arguments? ')'
+	function_call_arguments = function_call_argument [',' function_call_argument]*
 
 
 
